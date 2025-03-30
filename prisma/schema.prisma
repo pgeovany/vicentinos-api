@@ -9,16 +9,216 @@ datasource db {
 
 model Usuario {
   id     String  @id @default(cuid())
-  email  String  @unique @db.VarChar(100)
-  senha  String  @db.VarChar(200)
+  email  String  @unique
+  senha  String
   status String  @default("ATIVO")
   perfil String  @default("USUARIO")
-  nome   String? @db.VarChar(200)
+  nome   String?
 
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
   @@map("usuario")
+}
+
+model Produto {
+  id   String @id @default(cuid())
+  nome String @unique
+
+  estoque ProdutoEstoque[]
+
+  criadoEm                DateTime                      @default(now()) @map("criado_em")
+  atualizadoEm            DateTime?                     @updatedAt @map("atualizado_em")
+  produtoCesta            ProdutoCesta[]
+  doacoesRecebidas        ItemRecebimento[]
+  distribuicaoEmergencial ItemDistribuicaoEmergencial[]
+
+  @@map("produto")
+}
+
+model ProdutoEstoque {
+  id         String @id @default(cuid())
+  produtoId  String @unique @map("produto_id")
+  quantidade Int    @default(0)
+
+  produto       Produto                      @relation(fields: [produtoId], references: [id])
+  movimentacoes ProdutoMovimentacaoEstoque[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("produto_estoque")
+}
+
+model ProdutoMovimentacaoEstoque {
+  id               String  @id @default(cuid())
+  estoqueProdutoId String  @map("estoque_produto_id")
+  quantidade       Int     @default(0)
+  tipo             String // ENTRADA ou SAIDA
+  motivo           String?
+
+  produtoEstoque ProdutoEstoque @relation(fields: [estoqueProdutoId], references: [id])
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("produto_movimentacao_estoque")
+}
+
+model RecebimentoDoacao {
+  id         String   @id @default(cuid())
+  dataDoacao DateTime @default(now()) @map("data_doacao")
+  origem     String // ex: MISSA_DOMINGO, MISSA_SABADO, CAMPANHA, PONTUAL
+  observacao String?
+
+  itens ItemRecebimento[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("recebimento_doacao")
+}
+
+model ItemRecebimento {
+  id         String @id @default(cuid())
+  doacaoId   String @map("doacao_id")
+  produtoId  String @map("produto_id")
+  quantidade Int
+
+  recebimento RecebimentoDoacao @relation(fields: [doacaoId], references: [id])
+  produto     Produto           @relation(fields: [produtoId], references: [id])
+
+  @@map("item_recebimento")
+}
+
+model DistribuicaoEmergencial {
+  id               String   @id @default(cuid())
+  dataDistribuicao DateTime @default(now()) @map("data_distribuicao")
+  beneficiario     String?
+  motivo           String?
+
+  itens ItemDistribuicaoEmergencial[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("distribuicao_emergencial")
+}
+
+model ItemDistribuicaoEmergencial {
+  id                        String @id @default(cuid())
+  distribuicaoEmergencialId String @map("distribuicao_emergencial_id")
+  produtoId                 String @map("produto_id")
+  quantidade                Int
+
+  distribuicao DistribuicaoEmergencial @relation(fields: [distribuicaoEmergencialId], references: [id])
+  produto      Produto                 @relation(fields: [produtoId], references: [id])
+
+  @@map("item_distribuicao_emergencial")
+}
+
+model TipoCesta {
+  id   String @id @default(cuid())
+  nome String @unique
+
+  produtos      ProdutoCesta[]
+  beneficiarios Beneficiario[]
+
+  criadoEm        DateTime                @default(now()) @map("criado_em")
+  atualizadoEm    DateTime?               @updatedAt @map("atualizado_em")
+  historicoSaidas HistoricoDistribuicao[]
+
+  @@map("tipo_cesta")
+}
+
+model ProdutoCesta {
+  id          String @id @default(cuid())
+  produtoId   String @map("produto_id")
+  tipoCestaId String @map("tipo_cesta_id")
+
+  nomeProduto String
+  quantidade  Int    @default(0)
+
+  produto   Produto   @relation(fields: [produtoId], references: [id])
+  tipoCesta TipoCesta @relation(fields: [tipoCestaId], references: [id])
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("produto_cesta")
+}
+
+model Beneficiario {
+  id                String    @id @default(cuid())
+  status            String    @default("ATIVO")
+  motivoDesativacao String?
+  nome              String
+  cpf               String?   @unique
+  dataNascimento    DateTime? @map("data_nascimento")
+  telefone          String?
+  email             String?
+  tipoCestaId       String    @map("tipo_cesta_id")
+
+  tipoCesta TipoCesta             @relation(fields: [tipoCestaId], references: [id])
+  endereco  EnderecoBeneficiario?
+  membros   MembrosBeneficiario[]
+
+  criadoEm              DateTime                @default(now()) @map("criado_em")
+  atualizadoEm          DateTime?               @updatedAt @map("atualizado_em")
+  historicoRecebimentos HistoricoDistribuicao[]
+
+  @@map("beneficiario")
+}
+
+model EnderecoBeneficiario {
+  id             String  @id @default(cuid())
+  beneficiarioId String  @unique @map("beneficiario_id")
+  rua            String?
+  numero         String?
+  bairro         String?
+  cidade         String?
+  cep            String?
+  complemento    String?
+
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id])
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("endereco_beneficiario")
+}
+
+model MembrosBeneficiario {
+  id             String    @id @default(cuid())
+  beneficiarioId String    @map("beneficiario_id")
+  nome           String
+  cpf            String?   @unique
+  dataNascimento DateTime? @map("data_nascimento")
+  telefone       String?
+  email          String?
+  parentesco     String?
+
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id])
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("membros_beneficiario")
+}
+
+model HistoricoDistribuicao {
+  id               String   @id @default(cuid())
+  tipoCestaId      String   @map("tipo_cesta_id")
+  beneficiarioId   String   @map("beneficiario_id")
+  dataDistribuicao DateTime @map("data_distribuicao")
+
+  tipoCesta    TipoCesta    @relation(fields: [tipoCestaId], references: [id])
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id])
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("historico_distribuicao")
 }
 
 model ControleTentativaAcesso {
