@@ -25,13 +25,13 @@ model Produto {
   id   String @id @default(cuid())
   nome String @unique
 
-  estoque ProdutoEstoque[]
-
-  criadoEm                DateTime                      @default(now()) @map("criado_em")
-  atualizadoEm            DateTime?                     @updatedAt @map("atualizado_em")
+  estoque                 ProdutoEstoque[]
   produtoCesta            ProdutoCesta[]
   doacoesRecebidas        ItemRecebimento[]
   distribuicaoEmergencial ItemDistribuicaoEmergencial[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
   @@map("produto")
 }
@@ -121,12 +121,12 @@ model TipoCesta {
   id   String @id @default(cuid())
   nome String @unique
 
-  produtos      ProdutoCesta[]
-  beneficiarios Beneficiario[]
-
-  criadoEm        DateTime                @default(now()) @map("criado_em")
-  atualizadoEm    DateTime?               @updatedAt @map("atualizado_em")
+  produtos        ProdutoCesta[]
+  beneficiarios   Beneficiario[]
   historicoSaidas HistoricoDistribuicao[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
   @@map("tipo_cesta")
 }
@@ -135,7 +135,6 @@ model ProdutoCesta {
   id          String @id @default(cuid())
   produtoId   String @map("produto_id")
   tipoCestaId String @map("tipo_cesta_id")
-
   nomeProduto String
   quantidade  Int    @default(0)
 
@@ -159,13 +158,13 @@ model Beneficiario {
   email             String?
   tipoCestaId       String    @map("tipo_cesta_id")
 
-  tipoCesta TipoCesta             @relation(fields: [tipoCestaId], references: [id])
-  endereco  EnderecoBeneficiario?
-  membros   MembrosBeneficiario[]
-
-  criadoEm              DateTime                @default(now()) @map("criado_em")
-  atualizadoEm          DateTime?               @updatedAt @map("atualizado_em")
+  tipoCesta             TipoCesta               @relation(fields: [tipoCestaId], references: [id])
+  endereco              EnderecoBeneficiario?
+  membros               MembrosBeneficiario[]
   historicoRecebimentos HistoricoDistribuicao[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
   @@map("beneficiario")
 }
@@ -222,10 +221,11 @@ model HistoricoDistribuicao {
 }
 
 model ControleTentativaAcesso {
-  id       String   @id @default(cuid())
-  sessao   String
-  ip       String?
-  email    String?
+  id     String  @id @default(cuid())
+  sessao String
+  ip     String?
+  email  String?
+
   criadoEm DateTime @default(now()) @map("criado_em")
 
   @@map("controle_tentativa_acesso")
