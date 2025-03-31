@@ -7,3 +7,5 @@ export class CriarProdutoDto {
   @IsNotEmpty()
   nome: string;
 }
+
+export class EditarProdutoDto extends CriarProdutoDto {}
