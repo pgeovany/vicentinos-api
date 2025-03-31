@@ -22,10 +22,11 @@ model Usuario {
 }
 
 model Produto {
-  id   String @id @default(cuid())
-  nome String @unique
+  id     String @id @default(cuid())
+  nome   String @unique
+  status String @default("ATIVO")
 
-  estoque                 ProdutoEstoque[]
+  estoque                 ProdutoEstoque?
   produtoCesta            ProdutoCesta[]
   doacoesRecebidas        ItemRecebimento[]
   distribuicaoEmergencial ItemDistribuicaoEmergencial[]

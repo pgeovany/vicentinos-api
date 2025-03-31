@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/persistencia/banco/prisma/prisma.service';
 import { CriarProdutoDto, EditarProdutoDto } from './dto/criar-produto.dto';
-import { AppErrorConflict } from 'src/utils/errors/app-errors';
+import { AppErrorConflict, AppErrorNotFound } from 'src/utils/errors/app-errors';
 
 @Injectable()
 export class ProdutoService {
@@ -13,6 +13,21 @@ export class ProdutoService {
     });
   }
 
+  async buscarPorId(produtoId: string) {
+    const produto = await this.prismaService.produto.findUnique({
+      where: { id: produtoId },
+      include: {
+        estoque: true,
+      },
+    });
+
+    if (!produto) {
+      throw new AppErrorNotFound('Produto não encontrado');
+    }
+
+    return produto;
+  }
+
   async criar(params: CriarProdutoDto) {
     const { nome } = params;
 
@@ -22,7 +37,7 @@ export class ProdutoService {
       throw new AppErrorConflict('Este produto já existe');
     }
 
-    const produto = await this.prismaService.produto.create({
+    return await this.prismaService.produto.create({
       data: {
         nome,
         estoque: {
@@ -33,11 +48,6 @@ export class ProdutoService {
         estoque: true,
       },
     });
-
-    return {
-      ...produto,
-      estoque: produto.estoque[0],
-    };
   }
 
   async editar(params: { produtoId: string; data: EditarProdutoDto }) {
@@ -49,7 +59,7 @@ export class ProdutoService {
       throw new AppErrorConflict('Já existe um produto com esse nome');
     }
 
-    const produto = await this.prismaService.produto.update({
+    return await this.prismaService.produto.update({
       where: { id: produtoId },
       data: {
         nome: data.nome,
@@ -58,10 +68,5 @@ export class ProdutoService {
         estoque: true,
       },
     });
-
-    return {
-      ...produto,
-      estoque: produto.estoque[0],
-    };
   }
 }
