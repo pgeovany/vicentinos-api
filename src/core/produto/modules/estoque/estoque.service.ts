@@ -4,6 +4,9 @@ import { ProdutoService } from '../../produto.service';
 import { MovimentarEstoqueDto } from './dto/movimentar-estoque.dto';
 import { ENUM_STATUS_PRODUTO, ENUM_TIPO_MOVIMENTACAO_PRODUTO } from 'src/utils/enum/produto.enum';
 import { AppErrorBadRequest } from 'src/utils/errors/app-errors';
+import { ListarMovimentacoesEstoqueDto } from './dto/listar-movimentacoes-estoque.dto';
+import { endOfDay, startOfDay } from 'date-fns';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class EstoqueService {
@@ -119,5 +122,65 @@ export class EstoqueService {
         }),
       ]),
     );
+  }
+
+  async listarMovimentacoes(filtros: ListarMovimentacoesEstoqueDto) {
+    const { tipo, produtoId } = filtros;
+    const pagina = filtros.pagina ? +filtros.pagina : 1;
+    const quantidade = filtros.quantidade ? +filtros.quantidade : 10;
+    const dataInicio = filtros.dataInicio ? startOfDay(new Date(filtros.dataInicio)) : undefined;
+    const dataFim = filtros.dataFim ? endOfDay(new Date(filtros.dataFim)) : undefined;
+
+    const where: Prisma.ProdutoMovimentacaoEstoqueWhereInput = {
+      produtoEstoque: {
+        produtoId,
+      },
+      // tipo: {
+      //   not: ENUM_TIPO_MOVIMENTACAO_PRODUTO.AJUSTE,
+      // },
+      criadoEm: {
+        gte: dataInicio,
+        lte: dataFim,
+      },
+    };
+
+    if (tipo) {
+      where.tipo = tipo;
+    }
+
+    const movimentacoes = await this.prismaService.produtoMovimentacaoEstoque.findMany({
+      where,
+      include: {
+        produtoEstoque: {
+          select: {
+            produto: true,
+          },
+        },
+      },
+      take: quantidade,
+      skip: (pagina - 1) * quantidade,
+    });
+
+    const totalMovimentacoes = await this.prismaService.produtoMovimentacaoEstoque.count({ where });
+
+    const movimentacoesFormatradas = movimentacoes?.map((movimentacao) => {
+      return {
+        produtoId: movimentacao.produtoEstoque.produto.id,
+        produto: movimentacao.produtoEstoque.produto.nome,
+        ...movimentacao,
+        produtoEstoque: undefined,
+      };
+    });
+
+    return {
+      produtoId,
+      tipo,
+      dataInicio,
+      dataFim,
+      pagina,
+      quantidade,
+      totalPaginas: Math.ceil(totalMovimentacoes / quantidade),
+      resultado: movimentacoesFormatradas,
+    };
   }
 }

@@ -1,22 +1,23 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { EstoqueService } from './estoque.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Doc } from 'src/utils/docs/doc';
-import { ListarProdutosMaisNecessitadosResponseDto } from './doc/estoque.response.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ListarMovimentacoesEstoqueDto } from './dto/listar-movimentacoes-estoque.dto';
+import { ListarMovimentacoesEstoqueResponseDto } from './doc/estoque.response.dto';
 
 @ApiTags('Produto/Estoque')
+@UseGuards(JwtAuthGuard)
 @Controller('estoque')
 export class EstoqueController {
   constructor(private readonly estoqueService: EstoqueService) {}
 
   @Doc({
-    nome: '[PÚBLICO] Listar produtos mais necessitados',
-    descricao:
-      'Retorna a lista dos produtos mais necessitados, de acordo com o peso relativo de cada produto',
-    resposta: ListarProdutosMaisNecessitadosResponseDto,
+    nome: 'Listar movimentações estoque',
+    resposta: ListarMovimentacoesEstoqueResponseDto,
   })
-  @Get('/')
-  async listarProdutosMaisNecessitados() {
-    return await this.estoqueService.listarProdutosMaisNecessitados();
+  @Get('/movimentacoes')
+  async listarMovimentacoes(@Query() filtros: ListarMovimentacoesEstoqueDto) {
+    return await this.estoqueService.listarMovimentacoes(filtros);
   }
 }
