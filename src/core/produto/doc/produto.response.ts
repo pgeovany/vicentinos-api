@@ -33,3 +33,20 @@ export class ProdutoComEstoqueResponseDto {
   @ApiProperty({ type: EstoqueProdutoResponseDto })
   estoque: EstoqueProdutoResponseDto;
 }
+
+export class ListarProdutosResponseDto {
+  @ApiProperty({ example: 'Arroz' })
+  nome: string;
+
+  @ApiProperty({ example: 1 })
+  pagina: number;
+
+  @ApiProperty({ example: 15 })
+  quantidade: number;
+
+  @ApiProperty({ example: 1 })
+  totalPaginas: number;
+
+  @ApiProperty({ type: [ProdutoComEstoqueResponseDto] })
+  resultado: ProdutoComEstoqueResponseDto[];
+}

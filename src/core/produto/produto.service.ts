@@ -3,6 +3,8 @@ import { PrismaService } from 'src/persistencia/banco/prisma/prisma.service';
 import { CriarProdutoDto, EditarProdutoDto } from './dto/criar-produto.dto';
 import { AppErrorConflict, AppErrorNotFound } from 'src/utils/errors/app-errors';
 import { ENUM_STATUS_PRODUTO } from 'src/utils/enum/produto.enum';
+import { ListarProdutosDto } from './dto/listar-produtos-dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProdutoService {
@@ -47,6 +49,38 @@ export class ProdutoService {
       },
       include: { estoque: true },
     });
+  }
+
+  async listar(filtros: ListarProdutosDto) {
+    const pagina = filtros.pagina ? +filtros.pagina : 1;
+    const quantidade = filtros.quantidade ? +filtros.quantidade : 15;
+    const nome = filtros.nome ?? '';
+
+    const where: Prisma.ProdutoWhereInput = {
+      status: ENUM_STATUS_PRODUTO.ATIVO,
+      nome: {
+        contains: nome,
+        mode: 'insensitive',
+      },
+    };
+
+    const produtos = await this.prismaService.produto.findMany({
+      where,
+      include: { estoque: true },
+      take: quantidade,
+      skip: (pagina - 1) * quantidade,
+      orderBy: { nome: 'asc' },
+    });
+
+    const totalProdutos = await this.prismaService.produto.count({ where });
+
+    return {
+      nome,
+      pagina,
+      quantidade,
+      totalPaginas: Math.ceil(totalProdutos / quantidade),
+      resultado: produtos,
+    };
   }
 
   async editar(params: { produtoId: string; data: EditarProdutoDto }) {

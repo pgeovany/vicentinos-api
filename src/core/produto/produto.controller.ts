@@ -1,11 +1,12 @@
-import { Body, Controller, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ProdutoService } from './produto.service';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CriarProdutoDto, EditarProdutoDto } from './dto/criar-produto.dto';
 import { Doc } from 'src/utils/docs/doc';
-import { ProdutoComEstoqueResponseDto } from './doc/produto.response';
+import { ListarProdutosResponseDto, ProdutoComEstoqueResponseDto } from './doc/produto.response';
 import { AlterarStatusProdutoDto } from './dto/alterar-status-produto.dto';
+import { ListarProdutosDto } from './dto/listar-produtos-dto';
 
 @ApiTags('Produto')
 @UseGuards(JwtAuthGuard)
@@ -21,6 +22,16 @@ export class ProdutoController {
   @Post('/')
   async criar(@Body() data: CriarProdutoDto) {
     return await this.produtoService.criar(data);
+  }
+
+  @Doc({
+    nome: 'Listar produtos',
+    descricao: 'Lista todos os produtos ativos em ordem alfabética',
+    resposta: ListarProdutosResponseDto,
+  })
+  @Get('/')
+  async listar(@Query() filtros: ListarProdutosDto) {
+    return await this.produtoService.listar(filtros);
   }
 
   @Doc({
