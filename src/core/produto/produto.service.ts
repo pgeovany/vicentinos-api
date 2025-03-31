@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/persistencia/banco/prisma/prisma.service';
 import { CriarProdutoDto, EditarProdutoDto } from './dto/criar-produto.dto';
 import { AppErrorConflict, AppErrorNotFound } from 'src/utils/errors/app-errors';
+import { ENUM_STATUS_PRODUTO } from 'src/utils/enum/produto.enum';
 
 @Injectable()
 export class ProdutoService {
@@ -44,9 +45,7 @@ export class ProdutoService {
           create: {},
         },
       },
-      include: {
-        estoque: true,
-      },
+      include: { estoque: true },
     });
   }
 
@@ -61,12 +60,23 @@ export class ProdutoService {
 
     return await this.prismaService.produto.update({
       where: { id: produtoId },
-      data: {
-        nome: data.nome,
-      },
-      include: {
-        estoque: true,
-      },
+      data: { nome: data.nome },
+      include: { estoque: true },
+    });
+  }
+
+  async alterarStatus(params: { produtoId: string; status: ENUM_STATUS_PRODUTO }) {
+    const { produtoId, status } = params;
+    const produto = await this.buscarPorId(produtoId);
+
+    if (produto.status === status) {
+      return produto;
+    }
+
+    return await this.prismaService.produto.update({
+      where: { id: produtoId },
+      data: { status },
+      include: { estoque: true },
     });
   }
 }
