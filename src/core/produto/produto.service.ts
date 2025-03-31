@@ -18,10 +18,11 @@ export class ProdutoService {
 
   async buscarPorId(produtoId: string) {
     const produto = await this.prismaService.produto.findUnique({
-      where: { id: produtoId },
-      include: {
-        estoque: true,
+      where: {
+        id: produtoId,
+        status: ENUM_STATUS_PRODUTO.ATIVO,
       },
+      include: { estoque: true },
     });
 
     if (!produto) {
@@ -101,7 +102,15 @@ export class ProdutoService {
 
   async alterarStatus(params: { produtoId: string; status: ENUM_STATUS_PRODUTO }) {
     const { produtoId, status } = params;
-    const produto = await this.buscarPorId(produtoId);
+
+    const produto = await this.prismaService.produto.findUnique({
+      where: { id: produtoId },
+      include: { estoque: true },
+    });
+
+    if (!produto) {
+      throw new AppErrorNotFound('Produto não encontrado');
+    }
 
     if (produto.status === status) {
       return produto;
