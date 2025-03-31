@@ -172,7 +172,7 @@ export class AuthService {
       data: {
         token,
         perfil: usuario.perfil,
-        nome: usuario.nome || null,
+        nome: usuario.nome ?? null,
         id: usuario.id,
       },
     };
