@@ -22,16 +22,17 @@ model Usuario {
 }
 
 model Produto {
-  id   String @id @default(cuid())
-  nome String @unique
+  id     String @id @default(cuid())
+  nome   String @unique
+  status String @default("ATIVO")
 
-  estoque ProdutoEstoque[]
-
-  criadoEm                DateTime                      @default(now()) @map("criado_em")
-  atualizadoEm            DateTime?                     @updatedAt @map("atualizado_em")
+  estoque                 ProdutoEstoque?
   produtoCesta            ProdutoCesta[]
   doacoesRecebidas        ItemRecebimento[]
   distribuicaoEmergencial ItemDistribuicaoEmergencial[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
   @@map("produto")
 }
@@ -41,7 +42,7 @@ model ProdutoEstoque {
   produtoId  String @unique @map("produto_id")
   quantidade Int    @default(0)
 
-  produto       Produto                      @relation(fields: [produtoId], references: [id])
+  produto       Produto                      @relation(fields: [produtoId], references: [id], onDelete: Cascade)
   movimentacoes ProdutoMovimentacaoEstoque[]
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
@@ -57,7 +58,7 @@ model ProdutoMovimentacaoEstoque {
   tipo             String // ENTRADA ou SAIDA
   motivo           String?
 
-  produtoEstoque ProdutoEstoque @relation(fields: [estoqueProdutoId], references: [id])
+  produtoEstoque ProdutoEstoque @relation(fields: [estoqueProdutoId], references: [id], onDelete: Cascade)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -85,8 +86,8 @@ model ItemRecebimento {
   produtoId  String @map("produto_id")
   quantidade Int
 
-  recebimento RecebimentoDoacao @relation(fields: [doacaoId], references: [id])
-  produto     Produto           @relation(fields: [produtoId], references: [id])
+  recebimento RecebimentoDoacao @relation(fields: [doacaoId], references: [id], onDelete: Cascade)
+  produto     Produto           @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
   @@map("item_recebimento")
 }
@@ -111,8 +112,8 @@ model ItemDistribuicaoEmergencial {
   produtoId                 String @map("produto_id")
   quantidade                Int
 
-  distribuicao DistribuicaoEmergencial @relation(fields: [distribuicaoEmergencialId], references: [id])
-  produto      Produto                 @relation(fields: [produtoId], references: [id])
+  distribuicao DistribuicaoEmergencial @relation(fields: [distribuicaoEmergencialId], references: [id], onDelete: Cascade)
+  produto      Produto                 @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
   @@map("item_distribuicao_emergencial")
 }
@@ -121,12 +122,12 @@ model TipoCesta {
   id   String @id @default(cuid())
   nome String @unique
 
-  produtos      ProdutoCesta[]
-  beneficiarios Beneficiario[]
-
-  criadoEm        DateTime                @default(now()) @map("criado_em")
-  atualizadoEm    DateTime?               @updatedAt @map("atualizado_em")
+  produtos        ProdutoCesta[]
+  beneficiarios   Beneficiario[]
   historicoSaidas HistoricoDistribuicao[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
   @@map("tipo_cesta")
 }
@@ -135,12 +136,11 @@ model ProdutoCesta {
   id          String @id @default(cuid())
   produtoId   String @map("produto_id")
   tipoCestaId String @map("tipo_cesta_id")
-
   nomeProduto String
   quantidade  Int    @default(0)
 
-  produto   Produto   @relation(fields: [produtoId], references: [id])
-  tipoCesta TipoCesta @relation(fields: [tipoCestaId], references: [id])
+  produto   Produto   @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  tipoCesta TipoCesta @relation(fields: [tipoCestaId], references: [id], onDelete: Cascade)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -157,15 +157,15 @@ model Beneficiario {
   dataNascimento    DateTime? @map("data_nascimento")
   telefone          String?
   email             String?
-  tipoCestaId       String    @map("tipo_cesta_id")
+  tipoCestaId       String?   @map("tipo_cesta_id")
 
-  tipoCesta TipoCesta             @relation(fields: [tipoCestaId], references: [id])
-  endereco  EnderecoBeneficiario?
-  membros   MembrosBeneficiario[]
-
-  criadoEm              DateTime                @default(now()) @map("criado_em")
-  atualizadoEm          DateTime?               @updatedAt @map("atualizado_em")
+  tipoCesta             TipoCesta?              @relation(fields: [tipoCestaId], references: [id], onDelete: SetNull)
+  endereco              EnderecoBeneficiario?
+  membros               MembrosBeneficiario[]
   historicoRecebimentos HistoricoDistribuicao[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
   @@map("beneficiario")
 }
@@ -180,7 +180,7 @@ model EnderecoBeneficiario {
   cep            String?
   complemento    String?
 
-  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id])
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id], onDelete: Cascade)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -198,7 +198,7 @@ model MembrosBeneficiario {
   email          String?
   parentesco     String?
 
-  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id])
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id], onDelete: Cascade)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -208,12 +208,12 @@ model MembrosBeneficiario {
 
 model HistoricoDistribuicao {
   id               String   @id @default(cuid())
-  tipoCestaId      String   @map("tipo_cesta_id")
-  beneficiarioId   String   @map("beneficiario_id")
+  tipoCestaId      String?  @map("tipo_cesta_id")
+  beneficiarioId   String?  @map("beneficiario_id")
   dataDistribuicao DateTime @map("data_distribuicao")
 
-  tipoCesta    TipoCesta    @relation(fields: [tipoCestaId], references: [id])
-  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id])
+  tipoCesta    TipoCesta?    @relation(fields: [tipoCestaId], references: [id], onDelete: SetNull)
+  beneficiario Beneficiario? @relation(fields: [beneficiarioId], references: [id], onDelete: SetNull)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -222,10 +222,11 @@ model HistoricoDistribuicao {
 }
 
 model ControleTentativaAcesso {
-  id       String   @id @default(cuid())
-  sessao   String
-  ip       String?
-  email    String?
+  id     String  @id @default(cuid())
+  sessao String
+  ip     String?
+  email  String?
+
   criadoEm DateTime @default(now()) @map("criado_em")
 
   @@map("controle_tentativa_acesso")
