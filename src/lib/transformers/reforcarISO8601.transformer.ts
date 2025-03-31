@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import { toZonedTime, format } from 'date-fns-tz';
 
-export function ReforcarISO8601(type: 'comeco' | 'fim' = 'comeco') {
+export function ReforcarISO8601(tipo?: 'comeco' | 'fim') {
   return Transform(({ value }) => {
     if (typeof value !== 'string') {
       return value;
@@ -10,18 +10,22 @@ export function ReforcarISO8601(type: 'comeco' | 'fim' = 'comeco') {
 
     try {
       const timeZone = 'America/Sao_Paulo';
-      const dateWithoutTz = value.split('T')[0];
-      const parsedDate = parseISO(dateWithoutTz ?? value);
+      const dataSemTz = value.split('T')[0];
+      const dataParseada = parseISO(dataSemTz ?? value);
 
-      if (isNaN(parsedDate.getTime())) {
+      if (isNaN(dataParseada.getTime())) {
         return value;
       }
 
-      const boundaryDate = type === 'comeco' ? startOfDay(parsedDate) : endOfDay(parsedDate);
+      let dataFormatada = dataParseada;
 
-      const utcDate = toZonedTime(boundaryDate, timeZone);
+      if (tipo) {
+        dataFormatada = tipo === 'comeco' ? startOfDay(dataParseada) : endOfDay(dataParseada);
+      }
 
-      return format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", { timeZone: 'UTC' });
+      const dataUTC = toZonedTime(dataFormatada, timeZone);
+
+      return format(dataUTC, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", { timeZone: 'UTC' });
     } catch {
       return value;
     }
