@@ -1,5 +1,5 @@
-import { IsIn, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ENUM_TIPO_MOVIMENTACAO_PRODUTO } from 'src/utils/enum/produto.enum';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE } from 'src/utils/enum/estoque.enum';
 
 export class MovimentarEstoqueDto {
   @IsNotEmpty()
@@ -7,8 +7,8 @@ export class MovimentarEstoqueDto {
   produtoId: string;
 
   @IsNotEmpty()
-  @IsIn([ENUM_TIPO_MOVIMENTACAO_PRODUTO.ENTRADA, ENUM_TIPO_MOVIMENTACAO_PRODUTO.SAIDA])
-  tipo: ENUM_TIPO_MOVIMENTACAO_PRODUTO.ENTRADA | ENUM_TIPO_MOVIMENTACAO_PRODUTO.SAIDA;
+  @IsEnum(ENUM_TIPO_MOVIMENTACAO_ESTOQUE)
+  tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE;
 
   @IsNotEmpty()
   @IsInt()

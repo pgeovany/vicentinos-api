@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from 'src/persistencia/banco/prisma/prisma.service';
-import { ENUM_TIPO_MOVIMENTACAO_PRODUTO } from 'src/utils/enum/produto.enum';
+import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE, isEntrada, isSaida } from 'src/utils/enum/estoque.enum';
 
 @Injectable()
 export class EstoqueCronService {
@@ -29,7 +29,10 @@ export class EstoqueCronService {
       this.prismaService.produtoMovimentacaoEstoque.create({
         data: {
           estoqueProdutoId,
-          tipo: ENUM_TIPO_MOVIMENTACAO_PRODUTO.AJUSTE,
+          tipo:
+            diferencaQuantidade >= 0
+              ? ENUM_TIPO_MOVIMENTACAO_ESTOQUE.ENTRADA_AJUSTE
+              : ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_AJUSTE,
           quantidade: diferencaQuantidade,
           motivo: `Correção automática: ${diferencaQuantidade >= 0 ? 'Incremento' : 'Decremento'} de ${Math.abs(diferencaQuantidade)} unidades`,
         },
@@ -62,13 +65,13 @@ export class EstoqueCronService {
     const quantidadeEstoque = estoqueAtual?.quantidade ?? 0;
 
     const quantidadeCalculada = movimentacoes.reduce((total, mov) => {
-      const tipoMovimentacao = mov.tipo as ENUM_TIPO_MOVIMENTACAO_PRODUTO;
+      const tipoMovimentacao = mov.tipo as ENUM_TIPO_MOVIMENTACAO_ESTOQUE;
 
-      if (tipoMovimentacao === ENUM_TIPO_MOVIMENTACAO_PRODUTO.ENTRADA) {
+      if (isEntrada(tipoMovimentacao)) {
         return total + mov.quantidade;
       }
 
-      if (tipoMovimentacao === ENUM_TIPO_MOVIMENTACAO_PRODUTO.SAIDA) {
+      if (isSaida(tipoMovimentacao)) {
         return total - mov.quantidade;
       }
 

@@ -5,3 +5,11 @@ export enum ENUM_TIPO_MOVIMENTACAO_ESTOQUE {
   SAIDA_EMERGENCIAL = 'SAIDA_EMERGENCIAL', // Distribuições pontuais/emergenciais
   SAIDA_AJUSTE = 'SAIDA_AJUSTE', // Ajustes manuais
 }
+
+export const isEntrada = (tipo: string): boolean => {
+  return tipo.includes('ENTRADA');
+};
+
+export const isSaida = (tipo: string): boolean => {
+  return tipo.includes('SAIDA');
+};
