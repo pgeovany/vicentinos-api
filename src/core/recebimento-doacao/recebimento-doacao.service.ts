@@ -155,6 +155,8 @@ export class RecebimentoDoacaoService {
     });
 
     return {
+      dataInicio,
+      dataFim,
       origem,
       pagina,
       quantidade,
