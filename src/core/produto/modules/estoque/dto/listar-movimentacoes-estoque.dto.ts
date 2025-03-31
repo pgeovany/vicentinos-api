@@ -11,7 +11,7 @@ export class ListarMovimentacoesEstoqueDto {
   @ApiProperty({ example: 'ENTRADA', enum: ['ENTRADA', 'SAIDA'], required: false })
   @IsOptional()
   @IsIn(['ENTRADA', 'SAIDA'])
-  tipo: 'ENTRADA' | 'SAIDA';
+  tipo?: 'ENTRADA' | 'SAIDA';
 
   @ApiProperty({ example: '1', default: '1', required: false })
   @IsNumberString()
@@ -23,15 +23,15 @@ export class ListarMovimentacoesEstoqueDto {
   @IsOptional()
   quantidade?: string;
 
-  @ApiProperty({ example: '2024-01-01', required: false })
+  @ApiProperty({ example: '2025-03-01T00:00:00.000Z', required: false })
   @IsOptional()
   @IsDateString()
-  @ReforcarISO8601()
+  @ReforcarISO8601('comeco')
   dataInicio?: Date;
 
-  @ApiProperty({ example: '2024-01-01', required: false })
+  @ApiProperty({ example: '2025-03-31T00:00:00.000Z', required: false })
   @IsOptional()
   @IsDateString()
-  @ReforcarISO8601()
+  @ReforcarISO8601('fim')
   dataFim?: Date;
 }
