@@ -112,7 +112,7 @@ export class ProdutoService {
       throw new AppErrorNotFound('Produto não encontrado');
     }
 
-    if (produto.status === status) {
+    if ((produto.status as ENUM_STATUS_PRODUTO) === status) {
       return produto;
     }
 

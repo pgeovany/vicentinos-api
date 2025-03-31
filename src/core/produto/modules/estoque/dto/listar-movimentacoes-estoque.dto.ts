@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsIn, IsNumberString, IsOptional, IsString } from 'class-validator';
 import { ReforcarISO8601 } from 'src/lib/transformers/reforcarISO8601.transformer';
-import { ENUM_TIPO_MOVIMENTACAO_PRODUTO } from 'src/utils/enum/produto.enum';
 
 export class ListarMovimentacoesEstoqueDto {
   @ApiProperty({ example: 'ARROZ', required: false })
@@ -9,10 +8,10 @@ export class ListarMovimentacoesEstoqueDto {
   @IsOptional()
   nome?: string;
 
-  @ApiProperty({ example: ENUM_TIPO_MOVIMENTACAO_PRODUTO.ENTRADA, required: false })
+  @ApiProperty({ example: 'ENTRADA', enum: ['ENTRADA', 'SAIDA'], required: false })
   @IsOptional()
-  @IsEnum(ENUM_TIPO_MOVIMENTACAO_PRODUTO)
-  tipo: ENUM_TIPO_MOVIMENTACAO_PRODUTO;
+  @IsIn(['ENTRADA', 'SAIDA'])
+  tipo: 'ENTRADA' | 'SAIDA';
 
   @ApiProperty({ example: '1', default: '1', required: false })
   @IsNumberString()

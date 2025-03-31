@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/persistencia/banco/prisma/prisma.service';
 import { ProdutoService } from '../../produto.service';
 import { MovimentarEstoqueDto } from './dto/movimentar-estoque.dto';
-import { ENUM_STATUS_PRODUTO, ENUM_TIPO_MOVIMENTACAO_PRODUTO } from 'src/utils/enum/produto.enum';
+import { ENUM_STATUS_PRODUTO } from 'src/utils/enum/produto.enum';
 import { AppErrorBadRequest } from 'src/utils/errors/app-errors';
 import { ListarMovimentacoesEstoqueDto } from './dto/listar-movimentacoes-estoque.dto';
 import { endOfDay, startOfDay } from 'date-fns';
 import { Prisma } from '@prisma/client';
 import { ListarEntradasESaidas } from './dto/listar-quantidade-movimentacoes.dto';
+import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE, isEntrada, isSaida } from 'src/utils/enum/estoque.enum';
 
 @Injectable()
 export class EstoqueService {
@@ -97,7 +98,7 @@ export class EstoqueService {
 
     const produto = await this.produtoService.buscarPorId(produtoId);
 
-    if (tipo === ENUM_TIPO_MOVIMENTACAO_PRODUTO.SAIDA && produto.estoque!.quantidade < quantidade) {
+    if (isSaida(tipo) && produto.estoque!.quantidade < quantidade) {
       throw new AppErrorBadRequest('Não há itens suficientes no estoque');
     }
 
@@ -115,9 +116,7 @@ export class EstoqueService {
           where: { produtoId },
           data: {
             quantidade: {
-              ...(tipo === ENUM_TIPO_MOVIMENTACAO_PRODUTO.ENTRADA
-                ? { increment: quantidade }
-                : { decrement: quantidade }),
+              ...(isEntrada(tipo) ? { increment: quantidade } : { decrement: quantidade }),
             },
           },
         }),
@@ -143,7 +142,10 @@ export class EstoqueService {
         },
       },
       tipo: {
-        not: ENUM_TIPO_MOVIMENTACAO_PRODUTO.AJUSTE,
+        notIn: [
+          ENUM_TIPO_MOVIMENTACAO_ESTOQUE.ENTRADA_AJUSTE,
+          ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_AJUSTE,
+        ],
       },
       criadoEm: {
         gte: dataInicio,
@@ -208,7 +210,10 @@ export class EstoqueService {
         },
       },
       tipo: {
-        not: ENUM_TIPO_MOVIMENTACAO_PRODUTO.AJUSTE,
+        notIn: [
+          ENUM_TIPO_MOVIMENTACAO_ESTOQUE.ENTRADA_AJUSTE,
+          ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_AJUSTE,
+        ],
       },
       criadoEm: {
         gte: dataInicio,
@@ -247,14 +252,14 @@ export class EstoqueService {
 
     const movimentacaoProdutosMap: Record<
       string,
-      { quantidade: number; tipo: ENUM_TIPO_MOVIMENTACAO_PRODUTO; nome: string }[]
+      { quantidade: number; tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE; nome: string }[]
     > = {};
 
     movimentacoes.forEach((movimentacao) => {
       const movimentacaoProdutoId = movimentacao.produtoEstoque.produto.id;
       const nomeProduto = movimentacao.produtoEstoque.produto.nome;
       const quantidade = movimentacao.quantidade;
-      const tipo = movimentacao.tipo as ENUM_TIPO_MOVIMENTACAO_PRODUTO;
+      const tipo = movimentacao.tipo as ENUM_TIPO_MOVIMENTACAO_ESTOQUE;
 
       if (movimentacaoProdutosMap[movimentacaoProdutoId]) {
         movimentacaoProdutosMap[movimentacaoProdutoId].push({
@@ -281,9 +286,9 @@ export class EstoqueService {
     }[] = Object.entries(movimentacaoProdutosMap).map(([produtoId, movimentacoes]) => {
       const totais = movimentacoes.reduce(
         (acc, mov) => {
-          if (mov.tipo === ENUM_TIPO_MOVIMENTACAO_PRODUTO.ENTRADA) {
+          if (isEntrada(mov.tipo)) {
             acc.totalEntradas += mov.quantidade;
-          } else if (mov.tipo === ENUM_TIPO_MOVIMENTACAO_PRODUTO.SAIDA) {
+          } else if (isSaida(mov.tipo)) {
             acc.totalSaidas += mov.quantidade;
           }
           return acc;
