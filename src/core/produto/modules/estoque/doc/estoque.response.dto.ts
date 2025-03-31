@@ -1,5 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
+class MovimentacaoTotaisItemDto {
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  produtoId: string;
 
+  @ApiProperty({ example: 'ARROZ' })
+  nome: string;
+
+  @ApiProperty({ example: 10 })
+  totalEntradas: number;
+
+  @ApiProperty({ example: 5 })
+  totalSaidas: number;
+}
 class MovimentacaoEstoqueResponseDto {
   @ApiProperty({ example: 'cm8wixc8k0001gnldve58i5k5' })
   id: string;
@@ -34,8 +46,8 @@ class MovimentacaoEstoqueResponseDto {
 }
 
 export class ListarMovimentacoesEstoqueResponseDto {
-  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
-  produtoId?: string;
+  @ApiProperty({ example: 'ARROZ' })
+  nome?: string;
 
   @ApiProperty({ example: 'ENTRADA' })
   tipo?: string;
@@ -62,4 +74,21 @@ export class ListarMovimentacoesEstoqueResponseDto {
 export class ListarProdutosMaisNecessitadosResponseDto {
   @ApiProperty({ type: [String], example: ['ARROZ'] })
   produtos: string[];
+}
+
+export class ListarMovimentacaoTotaisResponseDto {
+  @ApiProperty({ example: '' })
+  produto?: string;
+
+  @ApiProperty({ example: 1 })
+  pagina: number;
+
+  @ApiProperty({ example: 15 })
+  quantidade: number;
+
+  @ApiProperty({ example: 1 })
+  totalPaginas: number;
+
+  @ApiProperty({ type: [MovimentacaoTotaisItemDto] })
+  resultado: MovimentacaoTotaisItemDto[];
 }

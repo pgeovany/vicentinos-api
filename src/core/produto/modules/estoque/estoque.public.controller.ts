@@ -10,7 +10,7 @@ export class EstoquePublicController {
   constructor(private readonly estoqueService: EstoqueService) {}
 
   @Doc({
-    nome: '[PÚBLICO] Listar produtos mais necessitados',
+    nome: 'Listar produtos mais necessitados',
     descricao:
       'Retorna a lista dos produtos mais necessitados, de acordo com o peso relativo de cada produto',
     resposta: ListarProdutosMaisNecessitadosResponseDto,

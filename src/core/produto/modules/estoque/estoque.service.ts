@@ -7,6 +7,7 @@ import { AppErrorBadRequest } from 'src/utils/errors/app-errors';
 import { ListarMovimentacoesEstoqueDto } from './dto/listar-movimentacoes-estoque.dto';
 import { endOfDay, startOfDay } from 'date-fns';
 import { Prisma } from '@prisma/client';
+import { ListarEntradasESaidas } from './dto/listar-quantidade-movimentacoes.dto';
 
 @Injectable()
 export class EstoqueService {
@@ -125,7 +126,8 @@ export class EstoqueService {
   }
 
   async listarMovimentacoes(filtros: ListarMovimentacoesEstoqueDto) {
-    const { tipo, produtoId } = filtros;
+    const { tipo } = filtros;
+    const nome = filtros.nome ?? '';
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 10;
     const dataInicio = filtros.dataInicio ? startOfDay(new Date(filtros.dataInicio)) : undefined;
@@ -133,11 +135,16 @@ export class EstoqueService {
 
     const where: Prisma.ProdutoMovimentacaoEstoqueWhereInput = {
       produtoEstoque: {
-        produtoId,
+        produto: {
+          nome: {
+            contains: nome,
+            mode: 'insensitive',
+          },
+        },
       },
-      // tipo: {
-      //   not: ENUM_TIPO_MOVIMENTACAO_PRODUTO.AJUSTE,
-      // },
+      tipo: {
+        not: ENUM_TIPO_MOVIMENTACAO_PRODUTO.AJUSTE,
+      },
       criadoEm: {
         gte: dataInicio,
         lte: dataFim,
@@ -173,7 +180,7 @@ export class EstoqueService {
     });
 
     return {
-      produtoId,
+      produto: nome,
       tipo,
       dataInicio,
       dataFim,
@@ -181,6 +188,124 @@ export class EstoqueService {
       quantidade,
       totalPaginas: Math.ceil(totalMovimentacoes / quantidade),
       resultado: movimentacoesFormatradas,
+    };
+  }
+
+  async listarEntradasESaidas(filtros: ListarEntradasESaidas) {
+    const nome = filtros.nome ?? '';
+    const pagina = filtros.pagina ? +filtros.pagina : 1;
+    const quantidade = filtros.quantidade ? +filtros.quantidade : 15;
+    const dataInicio = filtros.dataInicio ? startOfDay(new Date(filtros.dataInicio)) : undefined;
+    const dataFim = filtros.dataFim ? endOfDay(new Date(filtros.dataFim)) : undefined;
+
+    const where: Prisma.ProdutoMovimentacaoEstoqueWhereInput = {
+      produtoEstoque: {
+        produto: {
+          nome: {
+            contains: nome,
+            mode: 'insensitive',
+          },
+        },
+      },
+      tipo: {
+        not: ENUM_TIPO_MOVIMENTACAO_PRODUTO.AJUSTE,
+      },
+      criadoEm: {
+        gte: dataInicio,
+        lte: dataFim,
+      },
+    };
+
+    const movimentacoes = await this.prismaService.produtoMovimentacaoEstoque.findMany({
+      where,
+      select: {
+        quantidade: true,
+        tipo: true,
+        produtoEstoque: {
+          select: {
+            produto: true,
+          },
+        },
+      },
+      take: quantidade,
+      skip: (pagina - 1) * quantidade,
+    });
+
+    const totalMovimentacoes = await this.prismaService.produtoMovimentacaoEstoque.count({ where });
+
+    if (movimentacoes.length === 0) {
+      return {
+        produto: nome,
+        dataInicio,
+        dataFim,
+        pagina,
+        quantidade,
+        totalPaginas: Math.ceil(totalMovimentacoes / quantidade),
+        resultado: [],
+      };
+    }
+
+    const movimentacaoProdutosMap: Record<
+      string,
+      { quantidade: number; tipo: ENUM_TIPO_MOVIMENTACAO_PRODUTO; nome: string }[]
+    > = {};
+
+    movimentacoes.forEach((movimentacao) => {
+      const movimentacaoProdutoId = movimentacao.produtoEstoque.produto.id;
+      const nomeProduto = movimentacao.produtoEstoque.produto.nome;
+      const quantidade = movimentacao.quantidade;
+      const tipo = movimentacao.tipo as ENUM_TIPO_MOVIMENTACAO_PRODUTO;
+
+      if (movimentacaoProdutosMap[movimentacaoProdutoId]) {
+        movimentacaoProdutosMap[movimentacaoProdutoId].push({
+          quantidade,
+          tipo,
+          nome: nomeProduto,
+        });
+      } else {
+        movimentacaoProdutosMap[movimentacaoProdutoId] = [
+          {
+            quantidade,
+            tipo,
+            nome: nomeProduto,
+          },
+        ];
+      }
+    });
+
+    const movimentacaoTotais: {
+      produtoId: string;
+      nome: string;
+      totalEntradas: number;
+      totalSaidas: number;
+    }[] = Object.entries(movimentacaoProdutosMap).map(([produtoId, movimentacoes]) => {
+      const totais = movimentacoes.reduce(
+        (acc, mov) => {
+          if (mov.tipo === ENUM_TIPO_MOVIMENTACAO_PRODUTO.ENTRADA) {
+            acc.totalEntradas += mov.quantidade;
+          } else if (mov.tipo === ENUM_TIPO_MOVIMENTACAO_PRODUTO.SAIDA) {
+            acc.totalSaidas += mov.quantidade;
+          }
+          return acc;
+        },
+        { totalEntradas: 0, totalSaidas: 0 },
+      );
+
+      return {
+        produtoId,
+        nome: movimentacoes[0].nome,
+        ...totais,
+      };
+    });
+
+    return {
+      produto: nome,
+      dataInicio,
+      dataFim,
+      pagina,
+      quantidade,
+      totalPaginas: Math.ceil(totalMovimentacoes / quantidade),
+      resultado: movimentacaoTotais,
     };
   }
 }
