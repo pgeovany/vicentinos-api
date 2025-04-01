@@ -140,7 +140,7 @@ export class BeneficiarioService {
             nomeCesta: true,
             criadoEm: true,
           },
-          orderBy: { criadoEm: 'asc' },
+          orderBy: { criadoEm: 'desc' },
         },
       },
     });
@@ -232,9 +232,7 @@ export class BeneficiarioService {
         },
         skip: (pagina - 1) * quantidade,
         take: quantidade,
-        orderBy: {
-          nome: 'asc',
-        },
+        orderBy: { nome: 'asc' },
       }),
     ]);
 

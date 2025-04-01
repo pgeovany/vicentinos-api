@@ -133,6 +133,7 @@ export class RecebimentoDoacaoService {
           },
         },
       },
+      orderBy: { criadoEm: 'desc' },
       skip: (pagina - 1) * quantidade,
       take: quantidade,
     });
