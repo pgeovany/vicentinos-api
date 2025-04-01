@@ -154,14 +154,15 @@ model Beneficiario {
   motivoDesativacao String?
   nome              String
   cpf               String?   @unique
+  rg                String?   @unique
   dataNascimento    DateTime? @map("data_nascimento")
   telefone          String?
   email             String?
   tipoCestaId       String?   @map("tipo_cesta_id")
 
-  tipoCesta             TipoCesta?              @relation(fields: [tipoCestaId], references: [id], onDelete: SetNull)
+  tipoCesta             TipoCesta?               @relation(fields: [tipoCestaId], references: [id], onDelete: SetNull)
   endereco              EnderecoBeneficiario?
-  membros               MembrosBeneficiario[]
+  dependentes           DependenteBeneficiario[]
   historicoRecebimentos HistoricoDistribuicao[]
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
@@ -188,11 +189,12 @@ model EnderecoBeneficiario {
   @@map("endereco_beneficiario")
 }
 
-model MembrosBeneficiario {
+model DependenteBeneficiario {
   id             String    @id @default(cuid())
   beneficiarioId String    @map("beneficiario_id")
   nome           String
-  cpf            String?   @unique
+  cpf            String?
+  rg             String?
   dataNascimento DateTime? @map("data_nascimento")
   telefone       String?
   email          String?
@@ -203,14 +205,14 @@ model MembrosBeneficiario {
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
-  @@map("membros_beneficiario")
+  @@map("dependente_beneficiario")
 }
 
 model HistoricoDistribuicao {
-  id               String   @id @default(cuid())
-  tipoCestaId      String?  @map("tipo_cesta_id")
-  beneficiarioId   String?  @map("beneficiario_id")
-  dataDistribuicao DateTime @map("data_distribuicao")
+  id             String  @id @default(cuid())
+  tipoCestaId    String? @map("tipo_cesta_id")
+  beneficiarioId String? @map("beneficiario_id")
+  nomeCesta      String
 
   tipoCesta    TipoCesta?    @relation(fields: [tipoCestaId], references: [id], onDelete: SetNull)
   beneficiario Beneficiario? @relation(fields: [beneficiarioId], references: [id], onDelete: SetNull)
