@@ -1,0 +1,4 @@
+export enum ENUM_STATUS_BENEFICIARIO {
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
+}
