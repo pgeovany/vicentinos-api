@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ComposicaoCestaService } from './composicao-cesta.service';
 import { DistribuicaoCestaService } from './distribuicao-cesta.service';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CriarCestaDto } from './dto/criar-cesta.dto';
 import { Doc } from 'src/utils/docs/doc';
-import { CestaResponseDto } from './doc/cesta.response.dto';
+import { CestaResponseDto, ListarTiposCestasResponseDto } from './doc/cesta.response.dto';
 import { AdicionarProdutosCestaDto } from './dto/adicionar-produtos-cesta.dto';
 
 @ApiTags('Cesta')
@@ -25,6 +25,16 @@ export class CestaController {
   @Post('/criar')
   async criarCesta(@Body() params: CriarCestaDto) {
     return await this.composicaoCestaService.criar(params);
+  }
+
+  @Doc({
+    nome: 'Listar tipos de cesta',
+    descricao: 'Lista todos os tipos de cesta do sistema',
+    resposta: ListarTiposCestasResponseDto,
+  })
+  @Get('/tipos-cesta')
+  async listar() {
+    return await this.composicaoCestaService.listar();
   }
 
   @Doc({

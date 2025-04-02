@@ -96,6 +96,43 @@ export class ComposicaoCestaService {
     });
   }
 
+  async listar() {
+    const cestas = await this.prismaService.tipoCesta.findMany({
+      include: {
+        produtos: {
+          select: {
+            produto: {
+              select: {
+                id: true,
+                nome: true,
+              },
+            },
+            quantidade: true,
+          },
+        },
+      },
+    });
+
+    if (cestas.length === 0) {
+      return { cestas };
+    }
+
+    const cestasFormatadas = cestas.map((cesta) => {
+      return {
+        ...cesta,
+        produtos: cesta.produtos?.map((produtoCesta) => {
+          return {
+            id: produtoCesta.produto.id,
+            nome: produtoCesta.produto.nome,
+            quantidade: produtoCesta.quantidade,
+          };
+        }),
+      };
+    });
+
+    return { cestas: cestasFormatadas };
+  }
+
   async adicionarProdutos(params: { cestaId: string; data: AdicionarProdutosCestaDto }) {
     const { cestaId, data } = params;
     const { produtos } = data;

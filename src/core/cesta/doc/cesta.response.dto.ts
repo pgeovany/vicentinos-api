@@ -36,3 +36,8 @@ export class CestaResponseDto {
   @ApiProperty({ type: [ItemCestaResponseDto] })
   produtos: ItemCestaResponseDto[];
 }
+
+export class ListarTiposCestasResponseDto {
+  @ApiProperty({ type: [CestaResponseDto] })
+  cestas: CestaResponseDto[];
+}
