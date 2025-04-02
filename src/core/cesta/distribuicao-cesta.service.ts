@@ -82,8 +82,8 @@ export class DistribuicaoCestaService {
       throw new AppErrorBadRequest('Esta cesta não possui nenhum produto');
     }
 
-    return await this.prismaService.$transaction(async (tx) => {
-      const distribuicao = await tx.historicoDistribuicao.create({
+    return await this.prismaService.$transaction(async (prisma) => {
+      const distribuicao = await prisma.historicoDistribuicao.create({
         data: {
           beneficiarioId: beneficiario.id,
           tipoCestaId: beneficiario.tipoCestaId!,
@@ -91,16 +91,14 @@ export class DistribuicaoCestaService {
         },
       });
 
-      await Promise.all(
-        produtosCesta.map((produto) =>
-          this.estoqueService.movimentar({
-            prisma: tx,
-            produtoId: produto.produtoId,
-            quantidade: produto.quantidade,
-            tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_CESTAS,
-          }),
-        ),
-      );
+      for (const produto of produtosCesta) {
+        await this.estoqueService.movimentar({
+          prisma,
+          produtoId: produto.produtoId,
+          quantidade: produto.quantidade,
+          tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_CESTAS,
+        });
+      }
 
       return distribuicao;
     });

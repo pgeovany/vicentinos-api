@@ -101,9 +101,11 @@ export class EstoqueService {
       throw new AppErrorBadRequest('Não há itens suficientes no estoque');
     }
 
-    if (prisma) {
+    try {
+      const dbClient = prisma || this.prismaService;
+
       await Promise.all([
-        prisma.produtoMovimentacaoEstoque.create({
+        dbClient.produtoMovimentacaoEstoque.create({
           data: {
             estoqueProdutoId: produto.estoque!.id,
             tipo,
@@ -111,7 +113,7 @@ export class EstoqueService {
             motivo,
           },
         }),
-        prisma.produtoEstoque.update({
+        dbClient.produtoEstoque.update({
           where: { produtoId },
           data: {
             quantidade: {
@@ -120,30 +122,12 @@ export class EstoqueService {
           },
         }),
       ]);
-
-      return;
+    } catch (error) {
+      if (error.message?.includes('transaction')) {
+        throw new AppErrorBadRequest('Erro na transação. Por favor, tente novamente.');
+      }
+      throw error;
     }
-
-    await this.prismaService.$transaction((tx) =>
-      Promise.all([
-        tx.produtoMovimentacaoEstoque.create({
-          data: {
-            estoqueProdutoId: produto.estoque!.id,
-            tipo,
-            quantidade,
-            motivo,
-          },
-        }),
-        tx.produtoEstoque.update({
-          where: { produtoId },
-          data: {
-            quantidade: {
-              ...(isEntrada(tipo) ? { increment: quantidade } : { decrement: quantidade }),
-            },
-          },
-        }),
-      ]),
-    );
   }
 
   async listarMovimentacoes(filtros: ListarMovimentacoesEstoqueDto) {
