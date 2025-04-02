@@ -1,13 +1,28 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ComposicaoCestaService } from './composicao-cesta.service';
 import { DistribuicaoCestaService } from './distribuicao-cesta.service';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CriarCestaDto } from './dto/criar-cesta.dto';
+import { Doc } from 'src/utils/docs/doc';
+import { CestaResponseDto } from './doc/cesta.response.dto';
 
 @ApiTags('Cesta')
+@UseGuards(JwtAuthGuard)
 @Controller('cesta')
 export class CestaController {
   constructor(
     private readonly composicaoCestaService: ComposicaoCestaService,
     private readonly distribuicaoCestaService: DistribuicaoCestaService,
   ) {}
+
+  @Doc({
+    nome: 'Criar cesta',
+    descricao: 'Cria um novo tipo de cesta',
+    resposta: CestaResponseDto,
+  })
+  @Post('/criar')
+  async criarCesta(@Body() params: CriarCestaDto) {
+    return await this.composicaoCestaService.criar(params);
+  }
 }

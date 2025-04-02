@@ -1,0 +1,4 @@
+export enum ENUM_STATUS_CESTA {
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
+}
