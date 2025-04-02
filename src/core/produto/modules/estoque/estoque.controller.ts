@@ -5,6 +5,7 @@ import { Doc } from 'src/utils/docs/doc';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ListarMovimentacoesEstoqueDto } from './dto/listar-movimentacoes-estoque.dto';
 import {
+  AnalisarEstoqueResponseDto,
   ListarMovimentacaoTotaisResponseDto,
   ListarMovimentacoesEstoqueResponseDto,
 } from './doc/estoque.response.dto';
@@ -33,5 +34,15 @@ export class EstoqueController {
   @Get('/entradas-saidas')
   async listarEntradasESaidas(@Query() filtros: ListarEntradasESaidas) {
     return await this.estoqueService.listarEntradasESaidas(filtros);
+  }
+
+  @Doc({
+    nome: 'Análise de estoque',
+    descricao: 'Retorna análise de produtos reservados vs disponíveis em estoque',
+    resposta: AnalisarEstoqueResponseDto,
+  })
+  @Get('/analise-estoque')
+  async analisarEstoque() {
+    return await this.estoqueService.analisarEstoque();
   }
 }

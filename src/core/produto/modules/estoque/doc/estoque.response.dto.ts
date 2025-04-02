@@ -92,3 +92,39 @@ export class ListarMovimentacaoTotaisResponseDto {
   @ApiProperty({ type: [MovimentacaoTotaisItemDto] })
   resultado: MovimentacaoTotaisItemDto[];
 }
+
+class ProdutoAnaliseEstoqueResponseDto {
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  id: string;
+
+  @ApiProperty({ example: 'ARROZ' })
+  nome: string;
+
+  @ApiProperty({ example: 50 })
+  quantidadeReservada: number;
+
+  @ApiProperty({ example: 100 })
+  quantidadeDisponivel: number;
+
+  @ApiProperty({ example: 50 })
+  saldo: number;
+
+  @ApiProperty({ example: true })
+  suficiente: boolean;
+}
+
+class TotaisAnaliseEstoqueResponseDto {
+  @ApiProperty({ example: 2 })
+  produtosInsuficientes: number;
+
+  @ApiProperty({ example: 8 })
+  produtosSuficientes: number;
+}
+
+export class AnalisarEstoqueResponseDto {
+  @ApiProperty({ type: [ProdutoAnaliseEstoqueResponseDto] })
+  produtos: ProdutoAnaliseEstoqueResponseDto[];
+
+  @ApiProperty({ type: TotaisAnaliseEstoqueResponseDto })
+  totais: TotaisAnaliseEstoqueResponseDto;
+}

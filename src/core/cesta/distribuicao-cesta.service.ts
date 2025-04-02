@@ -259,6 +259,4 @@ export class DistribuicaoCestaService {
       })),
     };
   }
-
-  // TODO: Endpoint para listar quantidade total produtos em cestas ativas e total de produtos no estoque, para cruzar os dados e ver se já temos o suficiente
 }

@@ -8,6 +8,7 @@ import { ListarMovimentacoesEstoqueDto } from './dto/listar-movimentacoes-estoqu
 import { Prisma } from '@prisma/client';
 import { ListarEntradasESaidas } from './dto/listar-quantidade-movimentacoes.dto';
 import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE, isEntrada, isSaida } from 'src/utils/enum/estoque.enum';
+import { ENUM_STATUS_BENEFICIARIO } from 'src/utils/enum/beneficiario.enum';
 
 @Injectable()
 export class EstoqueService {
@@ -319,6 +320,72 @@ export class EstoqueService {
       quantidade,
       totalPaginas: Math.ceil(totalMovimentacoes / quantidade),
       resultado: movimentacaoTotais,
+    };
+  }
+
+  async analisarEstoque() {
+    const beneficiariosAtivos = await this.prismaService.beneficiario.findMany({
+      where: {
+        status: ENUM_STATUS_BENEFICIARIO.ATIVO,
+        tipoCestaId: { not: null },
+      },
+      select: {
+        tipoCesta: {
+          select: {
+            produtos: {
+              select: {
+                produtoId: true,
+                quantidade: true,
+                produto: {
+                  select: {
+                    nome: true,
+                    estoque: {
+                      select: {
+                        quantidade: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const produtosReservados = new Map<
+      string,
+      { nome: string; reservado: number; disponivel: number }
+    >();
+
+    beneficiariosAtivos.forEach((beneficiario) => {
+      beneficiario.tipoCesta?.produtos.forEach((produtoCesta) => {
+        const atual = produtosReservados.get(produtoCesta.produtoId) || {
+          nome: produtoCesta.produto.nome,
+          reservado: 0,
+          disponivel: produtoCesta.produto.estoque?.quantidade ?? 0,
+        };
+
+        atual.reservado += produtoCesta.quantidade;
+        produtosReservados.set(produtoCesta.produtoId, atual);
+      });
+    });
+
+    const analise = Array.from(produtosReservados.entries()).map(([id, dados]) => ({
+      id,
+      nome: dados.nome,
+      quantidadeReservada: dados.reservado,
+      quantidadeDisponivel: dados.disponivel,
+      saldo: dados.disponivel - dados.reservado,
+      suficiente: dados.disponivel >= dados.reservado,
+    }));
+
+    return {
+      produtos: [...analise].sort((a, b) => a.nome.localeCompare(b.nome)),
+      totais: {
+        produtosInsuficientes: analise.filter((p) => !p.suficiente).length,
+        produtosSuficientes: analise.filter((p) => p.suficiente).length,
+      },
     };
   }
 }
