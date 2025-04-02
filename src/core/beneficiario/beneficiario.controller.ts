@@ -14,7 +14,7 @@ import {
   ListarBeneficiariosResponseDto,
 } from './doc/beneficiario.response.dto';
 
-@ApiTags('Beneficiario')
+@ApiTags('Beneficiário')
 @UseGuards(JwtAuthGuard)
 @Controller('beneficiario')
 export class BeneficiarioController {
