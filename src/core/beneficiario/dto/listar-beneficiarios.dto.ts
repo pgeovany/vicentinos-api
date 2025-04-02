@@ -7,6 +7,11 @@ export class ListarBeneficiariosDto {
   @IsString()
   nome?: string;
 
+  @ApiProperty({ example: 'cm8zd745v0001gnulkfa94u9o', required: false })
+  @IsOptional()
+  @IsString()
+  tipoCestaId?: string;
+
   @ApiProperty({ example: '1', required: false })
   @IsNumberString()
   @IsOptional()
