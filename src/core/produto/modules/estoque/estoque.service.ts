@@ -165,6 +165,7 @@ export class EstoqueService {
           },
         },
       },
+      orderBy: { criadoEm: 'desc' },
       take: quantidade,
       skip: (pagina - 1) * quantidade,
     });
@@ -231,6 +232,7 @@ export class EstoqueService {
           },
         },
       },
+      orderBy: { criadoEm: 'desc' },
       take: quantidade,
       skip: (pagina - 1) * quantidade,
     });
