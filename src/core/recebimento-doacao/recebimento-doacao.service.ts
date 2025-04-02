@@ -53,15 +53,14 @@ export class RecebimentoDoacaoService {
         })),
       });
 
-      await Promise.all([
-        itens.map((item) =>
-          this.estoqueService.movimentar({
-            produtoId: item.produtoId,
-            quantidade: item.quantidade,
-            tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.ENTRADA_DOACAO,
-          }),
-        ),
-      ]);
+      for (const item of itens) {
+        await this.estoqueService.movimentar({
+          prisma,
+          produtoId: item.produtoId,
+          quantidade: item.quantidade,
+          tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.ENTRADA_DOACAO,
+        });
+      }
 
       return doacao;
     });

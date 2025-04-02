@@ -8,6 +8,7 @@ import { ListarMovimentacoesEstoqueDto } from './dto/listar-movimentacoes-estoqu
 import { Prisma } from '@prisma/client';
 import { ListarEntradasESaidas } from './dto/listar-quantidade-movimentacoes.dto';
 import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE, isEntrada, isSaida } from 'src/utils/enum/estoque.enum';
+import { ENUM_STATUS_BENEFICIARIO } from 'src/utils/enum/beneficiario.enum';
 
 @Injectable()
 export class EstoqueService {
@@ -93,7 +94,7 @@ export class EstoqueService {
   }
 
   async movimentar(params: MovimentarEstoqueDto) {
-    const { produtoId, tipo, quantidade, motivo } = params;
+    const { produtoId, tipo, quantidade, motivo, prisma } = params;
 
     const produto = await this.produtoService.buscarPorId(produtoId);
 
@@ -101,9 +102,11 @@ export class EstoqueService {
       throw new AppErrorBadRequest('Não há itens suficientes no estoque');
     }
 
-    await this.prismaService.$transaction((prisma) =>
-      Promise.all([
-        prisma.produtoMovimentacaoEstoque.create({
+    try {
+      const dbClient = prisma || this.prismaService;
+
+      await Promise.all([
+        dbClient.produtoMovimentacaoEstoque.create({
           data: {
             estoqueProdutoId: produto.estoque!.id,
             tipo,
@@ -111,7 +114,7 @@ export class EstoqueService {
             motivo,
           },
         }),
-        prisma.produtoEstoque.update({
+        dbClient.produtoEstoque.update({
           where: { produtoId },
           data: {
             quantidade: {
@@ -119,8 +122,13 @@ export class EstoqueService {
             },
           },
         }),
-      ]),
-    );
+      ]);
+    } catch (error) {
+      if (error.message?.includes('transaction')) {
+        throw new AppErrorBadRequest('Erro na transação. Por favor, tente novamente.');
+      }
+      throw error;
+    }
   }
 
   async listarMovimentacoes(filtros: ListarMovimentacoesEstoqueDto) {
@@ -312,6 +320,72 @@ export class EstoqueService {
       quantidade,
       totalPaginas: Math.ceil(totalMovimentacoes / quantidade),
       resultado: movimentacaoTotais,
+    };
+  }
+
+  async analisarEstoque() {
+    const beneficiariosAtivos = await this.prismaService.beneficiario.findMany({
+      where: {
+        status: ENUM_STATUS_BENEFICIARIO.ATIVO,
+        tipoCestaId: { not: null },
+      },
+      select: {
+        tipoCesta: {
+          select: {
+            produtos: {
+              select: {
+                produtoId: true,
+                quantidade: true,
+                produto: {
+                  select: {
+                    nome: true,
+                    estoque: {
+                      select: {
+                        quantidade: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const produtosReservados = new Map<
+      string,
+      { nome: string; reservado: number; disponivel: number }
+    >();
+
+    beneficiariosAtivos.forEach((beneficiario) => {
+      beneficiario.tipoCesta?.produtos.forEach((produtoCesta) => {
+        const atual = produtosReservados.get(produtoCesta.produtoId) || {
+          nome: produtoCesta.produto.nome,
+          reservado: 0,
+          disponivel: produtoCesta.produto.estoque?.quantidade ?? 0,
+        };
+
+        atual.reservado += produtoCesta.quantidade;
+        produtosReservados.set(produtoCesta.produtoId, atual);
+      });
+    });
+
+    const analise = Array.from(produtosReservados.entries()).map(([id, dados]) => ({
+      id,
+      nome: dados.nome,
+      quantidadeReservada: dados.reservado,
+      quantidadeDisponivel: dados.disponivel,
+      saldo: dados.disponivel - dados.reservado,
+      suficiente: dados.disponivel >= dados.reservado,
+    }));
+
+    return {
+      produtos: [...analise].sort((a, b) => a.nome.localeCompare(b.nome)),
+      totais: {
+        produtosInsuficientes: analise.filter((p) => !p.suficiente).length,
+        produtosSuficientes: analise.filter((p) => p.suficiente).length,
+      },
     };
   }
 }

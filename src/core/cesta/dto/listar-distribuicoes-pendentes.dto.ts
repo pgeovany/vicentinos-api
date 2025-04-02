@@ -1,23 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumberString, IsOptional, IsString } from 'class-validator';
 
-export class ListarBeneficiariosDto {
+export class ListarDistribuicoesPendentesDto {
   @ApiProperty({ example: 'Maria', required: false })
   @IsOptional()
   @IsString()
   nome?: string;
 
-  @ApiProperty({ example: 'cm8zd745v0001gnulkfa94u9o', required: false })
-  @IsOptional()
-  @IsString()
-  tipoCestaId?: string;
-
-  @ApiProperty({ example: '1', required: false })
+  @ApiProperty({ example: '1', default: '1', required: false })
   @IsNumberString()
   @IsOptional()
   pagina?: string;
 
-  @ApiProperty({ example: '10', required: false })
+  @ApiProperty({ example: '10', default: '15', required: false })
   @IsNumberString()
   @IsOptional()
   quantidade?: string;

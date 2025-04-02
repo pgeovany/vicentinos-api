@@ -48,16 +48,15 @@ export class DistribuicaoEmergencialService {
         })),
       });
 
-      await Promise.all([
-        itens.map((item) =>
-          this.estoqueService.movimentar({
-            motivo,
-            produtoId: item.produtoId,
-            quantidade: item.quantidade,
-            tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_EMERGENCIAL,
-          }),
-        ),
-      ]);
+      for (const item of itens) {
+        await this.estoqueService.movimentar({
+          prisma,
+          motivo,
+          produtoId: item.produtoId,
+          quantidade: item.quantidade,
+          tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_EMERGENCIAL,
+        });
+      }
 
       return distribuicao;
     });

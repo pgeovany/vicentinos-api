@@ -196,6 +196,7 @@ export class BeneficiarioService {
     const nome = filtros.nome ?? '';
 
     const where: Prisma.BeneficiarioWhereInput = {
+      tipoCestaId: filtros.tipoCestaId,
       nome: {
         contains: nome,
         mode: 'insensitive',
@@ -237,6 +238,7 @@ export class BeneficiarioService {
     ]);
 
     return {
+      nome,
       pagina,
       quantidade,
       totalPaginas: Math.ceil(total / quantidade),
