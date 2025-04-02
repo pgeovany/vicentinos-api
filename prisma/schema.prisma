@@ -138,8 +138,7 @@ model ProdutoCesta {
   id          String @id @default(cuid())
   produtoId   String @map("produto_id")
   tipoCestaId String @map("tipo_cesta_id")
-  nomeProduto String
-  quantidade  Int    @default(0)
+  quantidade  Int
 
   produto   Produto   @relation(fields: [produtoId], references: [id], onDelete: Cascade)
   tipoCesta TipoCesta @relation(fields: [tipoCestaId], references: [id], onDelete: Cascade)
