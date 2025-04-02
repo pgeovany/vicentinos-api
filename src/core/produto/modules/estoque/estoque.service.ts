@@ -93,7 +93,7 @@ export class EstoqueService {
   }
 
   async movimentar(params: MovimentarEstoqueDto) {
-    const { produtoId, tipo, quantidade, motivo } = params;
+    const { produtoId, tipo, quantidade, motivo, prisma } = params;
 
     const produto = await this.produtoService.buscarPorId(produtoId);
 
@@ -101,8 +101,8 @@ export class EstoqueService {
       throw new AppErrorBadRequest('Não há itens suficientes no estoque');
     }
 
-    await this.prismaService.$transaction((prisma) =>
-      Promise.all([
+    if (prisma) {
+      await Promise.all([
         prisma.produtoMovimentacaoEstoque.create({
           data: {
             estoqueProdutoId: produto.estoque!.id,
@@ -112,6 +112,29 @@ export class EstoqueService {
           },
         }),
         prisma.produtoEstoque.update({
+          where: { produtoId },
+          data: {
+            quantidade: {
+              ...(isEntrada(tipo) ? { increment: quantidade } : { decrement: quantidade }),
+            },
+          },
+        }),
+      ]);
+
+      return;
+    }
+
+    await this.prismaService.$transaction((tx) =>
+      Promise.all([
+        tx.produtoMovimentacaoEstoque.create({
+          data: {
+            estoqueProdutoId: produto.estoque!.id,
+            tipo,
+            quantidade,
+            motivo,
+          },
+        }),
+        tx.produtoEstoque.update({
           where: { produtoId },
           data: {
             quantidade: {
