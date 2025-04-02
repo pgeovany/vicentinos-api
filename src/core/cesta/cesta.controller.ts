@@ -79,6 +79,15 @@ export class CestaController {
   }
 
   @Doc({
+    nome: 'Entregar cesta',
+    descricao: 'Entrega a cesta para o beneficiário, atualizando o estoque e o histórico',
+  })
+  @Post('/entregar/:beneficiarioId')
+  async entregar(@Param('beneficiarioId') beneficiarioId: string) {
+    return await this.distribuicaoCestaService.entregar(beneficiarioId);
+  }
+
+  @Doc({
     nome: 'Listar histórico de distribuições',
     descricao: 'Lista o histórico de distribuições com filtros',
     resposta: ListarHistoricoDistribuicoesResponseDto,

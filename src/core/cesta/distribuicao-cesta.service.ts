@@ -5,10 +5,16 @@ import { ListarDistribuicoesPendentesDto } from './dto/listar-distribuicoes-pend
 import { ENUM_STATUS_BENEFICIARIO } from 'src/utils/enum/beneficiario.enum';
 import { Prisma } from '@prisma/client';
 import { ListarHistoricoDistribuicoesDto } from './dto/listar-historico-distribuicoes.dto';
+import { AppErrorBadRequest, AppErrorNotFound } from 'src/utils/errors/app-errors';
+import { EstoqueService } from '../produto/modules/estoque/estoque.service';
+import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE } from 'src/utils/enum/estoque.enum';
 
 @Injectable()
 export class DistribuicaoCestaService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly estoqueService: EstoqueService,
+  ) {}
 
   private async buscarBeneficiariosJaContemplados(params: { dataInicio: Date; dataFim: Date }) {
     const { dataInicio, dataFim } = params;
@@ -27,6 +33,77 @@ export class DistribuicaoCestaService {
       });
 
     return beneficiariosJaContempladosNoMes.map((d) => d.beneficiarioId!);
+  }
+
+  async entregar(beneficiarioId: string) {
+    const hoje = new Date();
+    const dataInicio = startOfMonth(hoje);
+    const dataFim = endOfMonth(hoje);
+
+    const beneficiario = await this.prismaService.beneficiario.findUnique({
+      where: {
+        id: beneficiarioId,
+        status: ENUM_STATUS_BENEFICIARIO.ATIVO,
+        tipoCestaId: { not: null },
+      },
+      select: {
+        id: true,
+        tipoCestaId: true,
+        tipoCesta: {
+          select: {
+            nome: true,
+            produtos: true,
+          },
+        },
+      },
+    });
+
+    if (!beneficiario) {
+      throw new AppErrorNotFound('Beneficiário não encontrado');
+    }
+
+    const jaRecebeu = await this.prismaService.historicoDistribuicao.findFirst({
+      where: {
+        beneficiarioId,
+        criadoEm: {
+          gte: dataInicio,
+          lte: dataFim,
+        },
+      },
+    });
+
+    if (jaRecebeu) {
+      throw new AppErrorBadRequest('Esse beneficiário já recebeu a cesta deste mês');
+    }
+
+    const produtosCesta = beneficiario.tipoCesta?.produtos;
+
+    if (!produtosCesta || produtosCesta.length === 0) {
+      throw new AppErrorBadRequest('Esta cesta não possui nenhum produto');
+    }
+
+    return await this.prismaService.$transaction(async (tx) => {
+      const distribuicao = await tx.historicoDistribuicao.create({
+        data: {
+          beneficiarioId: beneficiario.id,
+          tipoCestaId: beneficiario.tipoCestaId!,
+          nomeCesta: beneficiario.tipoCesta!.nome,
+        },
+      });
+
+      await Promise.all(
+        produtosCesta.map((produto) =>
+          this.estoqueService.movimentar({
+            prisma: tx,
+            produtoId: produto.produtoId,
+            quantidade: produto.quantidade,
+            tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_CESTAS,
+          }),
+        ),
+      );
+
+      return distribuicao;
+    });
   }
 
   async listarDistribuicoesPendentes(filtros: ListarDistribuicoesPendentesDto) {
