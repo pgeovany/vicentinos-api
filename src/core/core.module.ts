@@ -5,6 +5,7 @@ import { BeneficiarioModule } from './beneficiario/beneficiario.module';
 import { RecebimentoDoacaoModule } from './recebimento-doacao/recebimento-doacao.module';
 import { EstoqueModule } from './produto/modules/estoque/estoque.module';
 import { DistribuicaoEmergencialModule } from './distribuicao-emergencial/distribuicao-emergencial.module';
+import { TransparenciaModule } from './transparencia/transparencia.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { DistribuicaoEmergencialModule } from './distribuicao-emergencial/distri
     BeneficiarioModule,
     RecebimentoDoacaoModule,
     DistribuicaoEmergencialModule,
+    TransparenciaModule,
   ],
 })
 export class CoreModule {}
