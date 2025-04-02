@@ -65,15 +65,16 @@ export class ProdutoService {
       },
     };
 
-    const produtos = await this.prismaService.produto.findMany({
-      where,
-      include: { estoque: true },
-      take: quantidade,
-      skip: (pagina - 1) * quantidade,
-      orderBy: { nome: 'asc' },
-    });
-
-    const totalProdutos = await this.prismaService.produto.count({ where });
+    const [produtos, totalProdutos] = await Promise.all([
+      this.prismaService.produto.findMany({
+        where,
+        include: { estoque: true },
+        take: quantidade,
+        skip: (pagina - 1) * quantidade,
+        orderBy: { nome: 'asc' },
+      }),
+      this.prismaService.produto.count({ where }),
+    ]);
 
     return {
       nome,

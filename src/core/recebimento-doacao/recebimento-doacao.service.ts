@@ -115,30 +115,31 @@ export class RecebimentoDoacaoService {
       },
     };
 
-    const doacoes = await this.prismaService.recebimentoDoacao.findMany({
-      where,
-      select: {
-        id: true,
-        origem: true,
-        criadoEm: true,
-        itens: {
-          select: {
-            produtoId: true,
-            quantidade: true,
-            produto: {
-              select: {
-                nome: true,
+    const [doacoes, totalDoacoes] = await Promise.all([
+      this.prismaService.recebimentoDoacao.findMany({
+        where,
+        select: {
+          id: true,
+          origem: true,
+          criadoEm: true,
+          itens: {
+            select: {
+              produtoId: true,
+              quantidade: true,
+              produto: {
+                select: {
+                  nome: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: { criadoEm: 'desc' },
-      skip: (pagina - 1) * quantidade,
-      take: quantidade,
-    });
-
-    const totalDoacoes = await this.prismaService.recebimentoDoacao.count({ where });
+        orderBy: { criadoEm: 'desc' },
+        skip: (pagina - 1) * quantidade,
+        take: quantidade,
+      }),
+      this.prismaService.recebimentoDoacao.count({ where }),
+    ]);
 
     const doacoesFormatadas = doacoes.map((doacao) => {
       return {
