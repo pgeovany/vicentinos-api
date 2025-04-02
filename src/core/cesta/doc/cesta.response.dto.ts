@@ -80,3 +80,53 @@ export class ListarDistribuicoesPendentesResponseDto {
   @ApiProperty({ type: [BeneficiarioDistribuicaoDto] })
   beneficiarios: BeneficiarioDistribuicaoDto[];
 }
+
+class BeneficiarioHistoricoDistribuicaoDto {
+  @ApiProperty({ example: 'cm8wgxj13000ggn923ull87q6' })
+  id: string;
+
+  @ApiProperty({ example: 'José' })
+  nome: string;
+}
+
+class TipoCestaHistoricoDistribuicaoDto {
+  @ApiProperty({ example: 'cm8zd77x90002gnul6aj5w4qp' })
+  id: string;
+
+  @ApiProperty({ example: 'G' })
+  nome: string;
+}
+
+class DistribuicaoHistoricoDto {
+  @ApiProperty({ example: 'cm8zfalwb0001gnitrwq8qy02' })
+  id: string;
+
+  @ApiProperty({ example: '2025-04-02T04:24:34.139Z' })
+  criadoEm: string;
+
+  @ApiProperty({ type: BeneficiarioHistoricoDistribuicaoDto })
+  beneficiario: BeneficiarioHistoricoDistribuicaoDto;
+
+  @ApiProperty({ type: TipoCestaHistoricoDistribuicaoDto })
+  tipoCesta: TipoCestaHistoricoDistribuicaoDto;
+}
+
+export class ListarHistoricoDistribuicoesResponseDto {
+  @ApiProperty({ example: '', description: 'Nome usado no filtro' })
+  nome: string;
+
+  @ApiProperty({ example: 1 })
+  pagina: number;
+
+  @ApiProperty({ example: 15 })
+  quantidade: number;
+
+  @ApiProperty({ example: 1 })
+  totalPaginas: number;
+
+  @ApiProperty({ example: 2 })
+  total: number;
+
+  @ApiProperty({ type: [DistribuicaoHistoricoDto] })
+  distribuicoes: DistribuicaoHistoricoDto[];
+}

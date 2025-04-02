@@ -8,10 +8,12 @@ import { Doc } from 'src/utils/docs/doc';
 import {
   CestaResponseDto,
   ListarDistribuicoesPendentesResponseDto,
+  ListarHistoricoDistribuicoesResponseDto,
   ListarTiposCestasResponseDto,
 } from './doc/cesta.response.dto';
 import { AdicionarProdutosCestaDto } from './dto/adicionar-produtos-cesta.dto';
 import { ListarDistribuicoesPendentesDto } from './dto/listar-distribuicoes-pendentes.dto';
+import { ListarHistoricoDistribuicoesDto } from './dto/listar-historico-distribuicoes.dto';
 
 @ApiTags('Cesta')
 @UseGuards(JwtAuthGuard)
@@ -74,5 +76,15 @@ export class CestaController {
   @Get('/distribuicoes-pendentes')
   async listarDistribuicoesPendentesDto(@Query() filtros: ListarDistribuicoesPendentesDto) {
     return await this.distribuicaoCestaService.listarDistribuicoesPendentes(filtros);
+  }
+
+  @Doc({
+    nome: 'Listar histórico de distribuições',
+    descricao: 'Lista o histórico de distribuições com filtros',
+    resposta: ListarHistoricoDistribuicoesResponseDto,
+  })
+  @Get('/historico-distribuicoes')
+  async listarHistoricoDistribuicoes(@Query() filtros: ListarHistoricoDistribuicoesDto) {
+    return await this.distribuicaoCestaService.listarHistoricoDistribuicoes(filtros);
   }
 }
