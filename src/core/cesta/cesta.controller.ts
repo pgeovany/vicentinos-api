@@ -1,12 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ComposicaoCestaService } from './composicao-cesta.service';
 import { DistribuicaoCestaService } from './distribuicao-cesta.service';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CriarCestaDto } from './dto/criar-cesta.dto';
 import { Doc } from 'src/utils/docs/doc';
-import { CestaResponseDto, ListarTiposCestasResponseDto } from './doc/cesta.response.dto';
+import {
+  CestaResponseDto,
+  ListarDistribuicoesPendentesResponseDto,
+  ListarTiposCestasResponseDto,
+} from './doc/cesta.response.dto';
 import { AdicionarProdutosCestaDto } from './dto/adicionar-produtos-cesta.dto';
+import { ListarDistribuicoesPendentesDto } from './dto/listar-distribuicoes-pendentes.dto';
 
 @ApiTags('Cesta')
 @UseGuards(JwtAuthGuard)
@@ -59,5 +64,15 @@ export class CestaController {
   @Delete('/:cestaId/produto/:produtoId')
   async removerProduto(@Param('cestaId') cestaId: string, @Param('produtoId') produtoId: string) {
     return await this.composicaoCestaService.removerProduto({ cestaId, produtoId });
+  }
+
+  @Doc({
+    nome: 'Listar distribuições pendentes',
+    descricao: 'Lista todas as distribuições pendentes do mês',
+    resposta: ListarDistribuicoesPendentesResponseDto,
+  })
+  @Get('/distribuicoes-pendentes')
+  async listarDistribuicoesPendentesDto(@Query() filtros: ListarDistribuicoesPendentesDto) {
+    return await this.distribuicaoCestaService.listarDistribuicoesPendentes(filtros);
   }
 }

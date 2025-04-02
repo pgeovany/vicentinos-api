@@ -11,6 +11,28 @@ class ItemCestaResponseDto {
   quantidade: number;
 }
 
+class TipoCestaDistribuicaoDto {
+  @ApiProperty({ example: 'cm8zd745v0001gnulkfa94u9o' })
+  id: string;
+
+  @ApiProperty({ example: 'M' })
+  nome: string;
+
+  @ApiProperty({ type: [ItemCestaResponseDto] })
+  produtos: ItemCestaResponseDto[];
+}
+
+class BeneficiarioDistribuicaoDto {
+  @ApiProperty({ example: 'cm8wgx5zp000egn92u2409jlc' })
+  id: string;
+
+  @ApiProperty({ example: 'João' })
+  nome: string;
+
+  @ApiProperty({ type: TipoCestaDistribuicaoDto })
+  tipoCesta: TipoCestaDistribuicaoDto;
+}
+
 export class CestaResponseDto {
   @ApiProperty({ example: 'cm8zbgjap0000gnfh9hmk13gd' })
   id: string;
@@ -40,4 +62,21 @@ export class CestaResponseDto {
 export class ListarTiposCestasResponseDto {
   @ApiProperty({ type: [CestaResponseDto] })
   cestas: CestaResponseDto[];
+}
+
+export class ListarDistribuicoesPendentesResponseDto {
+  @ApiProperty({ example: 1 })
+  pagina: number;
+
+  @ApiProperty({ example: 15 })
+  quantidade: number;
+
+  @ApiProperty({ example: 1 })
+  totalPaginas: number;
+
+  @ApiProperty({ example: 3 })
+  beneficiariosRestantes: number;
+
+  @ApiProperty({ type: [BeneficiarioDistribuicaoDto] })
+  beneficiarios: BeneficiarioDistribuicaoDto[];
 }
