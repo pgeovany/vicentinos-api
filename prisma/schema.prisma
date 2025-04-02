@@ -119,8 +119,10 @@ model ItemDistribuicaoEmergencial {
 }
 
 model TipoCesta {
-  id   String @id @default(cuid())
-  nome String @unique
+  id        String  @id @default(cuid())
+  nome      String  @unique
+  status    String  @default("ATIVO")
+  descricao String?
 
   produtos        ProdutoCesta[]
   beneficiarios   Beneficiario[]
