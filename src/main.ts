@@ -12,9 +12,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle(process.env.APP_NAME ?? 'API')
-    .setDescription(process.env.APP_DESCRIPTION ?? 'Documentação da API')
-    .setVersion(process.env.APP_VERSION ?? '0.0')
+    .setTitle('API Doações - Vincentinos')
+    .setDescription('Documentação da API')
     .addBearerAuth()
     .addTag('[PÚBLICO] - Produto/Estoque')
     .addTag('[PÚBLICO] - Transparência')
