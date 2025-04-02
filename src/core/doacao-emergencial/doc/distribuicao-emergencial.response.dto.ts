@@ -47,3 +47,31 @@ export class ListarDistribuicoesEmergenciaisResponseDto {
   @ApiProperty({ type: [DistribuicaoEmergencialResponseDto] })
   resultado: DistribuicaoEmergencialResponseDto[];
 }
+
+class ProdutoDistribuicaoEmergencialEstatisticaResponseDto {
+  @ApiProperty({ example: 'ARROZ' })
+  nome: string;
+
+  @ApiProperty({ example: 150 })
+  quantidade: number;
+}
+
+export class EstatisticasDistribuicoesEmergenciaisResponseDto {
+  @ApiProperty({ example: '2023-12-31T03:00:00.000Z' })
+  dataInicio?: string;
+
+  @ApiProperty({ example: '2025-10-01T02:59:59.999Z' })
+  dataFim?: string;
+
+  @ApiProperty({ example: 100 })
+  totalDistribuicoes: number;
+
+  @ApiProperty({ example: 450 })
+  totalItensDistribuidos: number;
+
+  @ApiProperty({ example: 4.5 })
+  mediaItensPorDistribuicao: number;
+
+  @ApiProperty({ type: [ProdutoDistribuicaoEmergencialEstatisticaResponseDto] })
+  quantidadePorProduto: ProdutoDistribuicaoEmergencialEstatisticaResponseDto[];
+}

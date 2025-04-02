@@ -7,6 +7,7 @@ import { SalvarDistribuicaoEmergencialDto } from './dto/salvar-distribuicao-emer
 import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE } from 'src/utils/enum/estoque.enum';
 import { ListarDistribuicoesEmergenciaisDto } from './dto/listar-distribuicao-emergencial.dto';
 import { Prisma } from '@prisma/client';
+import { ObterEstatisticasDistribuicaoEmergencialDto } from './dto/obter-estatisticas-distribuicao-emergencial.dto';
 
 @Injectable()
 export class DistribuicaoEmergencialService {
@@ -160,6 +161,69 @@ export class DistribuicaoEmergencialService {
       quantidade,
       totalPaginas: Math.ceil(totalDistribuicoes / quantidade),
       resultado: distribuicoesFormatadas,
+    };
+  }
+
+  async obterEstatisticas(params: ObterEstatisticasDistribuicaoEmergencialDto) {
+    const dataInicio = params.dataInicio ?? undefined;
+    const dataFim = params.dataFim ?? undefined;
+
+    const where: Prisma.DistribuicaoEmergencialWhereInput = {
+      criadoEm: {
+        gte: dataInicio,
+        lte: dataFim,
+      },
+    };
+
+    const [totalDistribuicoes, produtosDistribuidos, totalItens] = await Promise.all([
+      this.prismaService.distribuicaoEmergencial.count({ where }),
+
+      this.prismaService.itemDistribuicaoEmergencial.groupBy({
+        by: ['produtoId'],
+        where: {
+          distribuicao: where,
+        },
+        _sum: {
+          quantidade: true,
+        },
+      }),
+
+      this.prismaService.itemDistribuicaoEmergencial.aggregate({
+        where: {
+          distribuicao: where,
+        },
+        _sum: {
+          quantidade: true,
+        },
+      }),
+    ]);
+
+    const produtos = await this.prismaService.produto.findMany({
+      where: {
+        id: {
+          in: produtosDistribuidos.map((p) => p.produtoId),
+        },
+      },
+      select: {
+        id: true,
+        nome: true,
+      },
+    });
+
+    return {
+      dataInicio,
+      dataFim,
+      totalDistribuicoes,
+      totalItensDistribuidos: totalItens._sum.quantidade ?? 0,
+      mediaItensPorDistribuicao: totalDistribuicoes
+        ? (totalItens._sum.quantidade ?? 0) / totalDistribuicoes
+        : 0,
+      quantidadePorProduto: produtosDistribuidos
+        .map((p) => ({
+          nome: produtos.find((prod) => prod.id === p.produtoId)?.nome ?? '',
+          quantidade: p._sum.quantidade ?? 0,
+        }))
+        .sort((a, b) => b.quantidade - a.quantidade),
     };
   }
 }

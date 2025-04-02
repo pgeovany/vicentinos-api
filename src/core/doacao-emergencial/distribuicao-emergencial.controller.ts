@@ -6,9 +6,11 @@ import { SalvarDistribuicaoEmergencialDto } from './dto/salvar-distribuicao-emer
 import { Doc } from 'src/utils/docs/doc';
 import {
   DistribuicaoEmergencialResponseDto,
+  EstatisticasDistribuicoesEmergenciaisResponseDto,
   ListarDistribuicoesEmergenciaisResponseDto,
 } from './doc/distribuicao-emergencial.response.dto';
 import { ListarDistribuicoesEmergenciaisDto } from './dto/listar-distribuicao-emergencial.dto';
+import { ObterEstatisticasDistribuicaoEmergencialDto } from './dto/obter-estatisticas-distribuicao-emergencial.dto';
 
 @ApiTags('Distribuição emergencial')
 @UseGuards(JwtAuthGuard)
@@ -34,5 +36,15 @@ export class DistribuicaoEmergencialController {
   @Get('/')
   async listar(@Query() params: ListarDistribuicoesEmergenciaisDto) {
     return await this.distribuicaoEmergencialService.listar(params);
+  }
+
+  @Doc({
+    nome: 'Obter estatísticas',
+    descricao: 'Retorna estatísticas das distribuições emergenciais feitas no período',
+    resposta: EstatisticasDistribuicoesEmergenciaisResponseDto,
+  })
+  @Get('/estatisticas')
+  async obterEstatisticas(@Query() params: ObterEstatisticasDistribuicaoEmergencialDto) {
+    return await this.distribuicaoEmergencialService.obterEstatisticas(params);
   }
 }
