@@ -4,7 +4,7 @@ import { CestaModule } from './cesta/cesta.module';
 import { BeneficiarioModule } from './beneficiario/beneficiario.module';
 import { RecebimentoDoacaoModule } from './recebimento-doacao/recebimento-doacao.module';
 import { EstoqueModule } from './produto/modules/estoque/estoque.module';
-import { DistribuicaoEmergencialModule } from './doacao-emergencial/distribuicao-emergencial.module';
+import { DistribuicaoEmergencialModule } from './distribuicao-emergencial/distribuicao-emergencial.module';
 
 @Module({
   imports: [
