@@ -16,6 +16,15 @@ async function bootstrap() {
     .setDescription(process.env.APP_DESCRIPTION ?? 'Documentação da API')
     .setVersion(process.env.APP_VERSION ?? '0.0')
     .addBearerAuth()
+    .addTag('[PÚBLICO] - Produto/Estoque')
+    .addTag('[PÚBLICO] - Transparência')
+    .addTag('Autenticação')
+    .addTag('Produto')
+    .addTag('Produto/Estoque')
+    .addTag('Cesta')
+    .addTag('Beneficiário')
+    .addTag('Recebimento doação')
+    .addTag('Distribuição emergencial')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
