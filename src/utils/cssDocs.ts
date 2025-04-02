@@ -1,16 +1,4 @@
 export const customCss = `
-body>div:first-child::before {
-  content: url(https://www.pinaculodigital.com.br/images/light-logo.svg);
-  display: block;
-  background-color: #22252b;
-  padding: 25px 30px 15px 30px;
-  z-index: 999;
-  box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2);
-  max-height: 90px;
-  width: 100%;
-  position: fixed; 
-  top: 0;
-}
 .open-api-client-button {
   display: none !important;
 }
