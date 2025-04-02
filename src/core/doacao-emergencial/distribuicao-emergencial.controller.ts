@@ -1,10 +1,14 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { DistribuicaoEmergencialService } from './distribuicao-emergencial.service';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { SalvarDistribuicaoEmergencialDto } from './dto/salvar-distribuicao-emergencial.dto';
 import { Doc } from 'src/utils/docs/doc';
-import { DistribuicaoEmergencialResponseDto } from './doc/distribuicao-emergencial.response.dto';
+import {
+  DistribuicaoEmergencialResponseDto,
+  ListarDistribuicoesEmergenciaisResponseDto,
+} from './doc/distribuicao-emergencial.response.dto';
+import { ListarDistribuicoesEmergenciaisDto } from './dto/listar-distribuicao-emergencial.dto';
 
 @ApiTags('Distribuição emergencial')
 @UseGuards(JwtAuthGuard)
@@ -20,5 +24,15 @@ export class DistribuicaoEmergencialController {
   @Post('/')
   async salvar(@Body() params: SalvarDistribuicaoEmergencialDto) {
     return await this.distribuicaoEmergencialService.salvar(params);
+  }
+
+  @Doc({
+    nome: 'Listar distribuições emergenciais',
+    descricao: 'Lista todas as distribuições emergenciais, com filtros',
+    resposta: ListarDistribuicoesEmergenciaisResponseDto,
+  })
+  @Get('/')
+  async listar(@Query() params: ListarDistribuicoesEmergenciaisDto) {
+    return await this.distribuicaoEmergencialService.listar(params);
   }
 }
