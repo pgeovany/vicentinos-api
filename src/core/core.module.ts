@@ -6,8 +6,10 @@ import { RecebimentoDoacaoModule } from './recebimento-doacao/recebimento-doacao
 import { EstoqueModule } from './produto/modules/estoque/estoque.module';
 import { DistribuicaoEmergencialModule } from './distribuicao-emergencial/distribuicao-emergencial.module';
 import { TransparenciaModule } from './transparencia/transparencia.module';
+import { CoreController } from './core.controller';
 
 @Module({
+  controllers: [CoreController],
   imports: [
     ProdutoModule,
     EstoqueModule,
