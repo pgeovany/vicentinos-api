@@ -60,6 +60,9 @@ export class BeneficiarioResponseDto {
   @ApiProperty({ example: 'Maria da Silva' })
   nome: string;
 
+  @ApiProperty({ example: 'ATIVO' })
+  status: string;
+
   @ApiProperty({ example: '123.456.789-00' })
   cpf: string;
 

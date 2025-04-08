@@ -215,6 +215,7 @@ export class BeneficiarioService {
           dataNascimento: true,
           telefone: true,
           email: true,
+          status: true,
           endereco: true,
           criadoEm: true,
           tipoCesta: {
