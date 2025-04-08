@@ -72,6 +72,9 @@ export class BeneficiarioResponseDto {
   @ApiProperty({ example: 'maria@email.com' })
   email: string;
 
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
+  criadoEm: Date;
+
   @ApiProperty({ type: EnderecoResponseDto })
   endereco: EnderecoResponseDto;
 
