@@ -113,12 +113,14 @@ export class BeneficiarioService {
       select: {
         id: true,
         nome: true,
+        status: true,
         cpf: true,
         rg: true,
         dataNascimento: true,
         telefone: true,
         email: true,
         endereco: true,
+        criadoEm: true,
         tipoCesta: {
           select: {
             id: true,
