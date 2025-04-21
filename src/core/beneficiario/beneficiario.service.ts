@@ -131,6 +131,7 @@ export class BeneficiarioService {
             id: true,
             nome: true,
             parentesco: true,
+            dataNascimento: true,
           },
           orderBy: { nome: 'asc' },
         },
