@@ -69,13 +69,13 @@ export class BeneficiarioService {
     const beneficiario = await this.prismaService.beneficiario.findUnique({
       where: {
         id: beneficiarioId,
-        status: ENUM_STATUS_BENEFICIARIO.ATIVO,
       },
       select: {
         id: true,
         nome: true,
         cpf: true,
         rg: true,
+        status: true,
         dataNascimento: true,
         telefone: true,
         email: true,
@@ -108,7 +108,6 @@ export class BeneficiarioService {
     const beneficiario = await this.prismaService.beneficiario.findUnique({
       where: {
         id: beneficiarioId,
-        status: ENUM_STATUS_BENEFICIARIO.ATIVO,
       },
       select: {
         id: true,
@@ -343,5 +342,19 @@ export class BeneficiarioService {
     });
 
     return await this.buscarPorId(beneficiarioId);
+  }
+
+  async alterarStatus(beneficiarioId: string) {
+    const beneficiario = await this.buscarPorId(beneficiarioId);
+
+    const novoStatus =
+      beneficiario.status === ENUM_STATUS_BENEFICIARIO.ATIVO
+        ? ENUM_STATUS_BENEFICIARIO.INATIVO
+        : ENUM_STATUS_BENEFICIARIO.ATIVO;
+
+    await this.prismaService.beneficiario.update({
+      where: { id: beneficiarioId },
+      data: { status: novoStatus },
+    });
   }
 }

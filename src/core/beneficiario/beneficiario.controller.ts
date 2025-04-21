@@ -108,4 +108,13 @@ export class BeneficiarioController {
       tipoCestaId: data.tipoCestaId,
     });
   }
+
+  @Doc({
+    nome: 'Alterar status',
+    descricao: 'Altera o status do beneficiário',
+  })
+  @Put('/:beneficiarioId/status')
+  async alterarStatus(@Param('beneficiarioId') beneficiarioId: string) {
+    return await this.beneficiarioService.alterarStatus(beneficiarioId);
+  }
 }
