@@ -23,12 +23,12 @@ class ItemDoacaoDto {
 }
 
 export class SalvarDistribuicaoEmergencialDto {
-  @ApiProperty({ example: 'José' })
+  @ApiProperty({ example: 'José', required: false })
   @IsOptional()
   @IsString()
   beneficiario?: string;
 
-  @ApiProperty({ example: 'Doação emergencial' })
+  @ApiProperty({ example: 'Doação emergencial', required: false })
   @IsOptional()
   @IsString()
   motivo?: string;

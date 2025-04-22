@@ -12,7 +12,7 @@ import { SanitizarStringNumerica } from 'src/lib/transformers/sanitizarStringNum
 import { IsCPF } from 'src/lib/validators/documentoFiscal.validator';
 
 export class CriarBeneficiarioDto {
-  @ApiProperty({ example: 'jklasdjfkl32jm' })
+  @ApiProperty({ example: 'jklasdjfkl32jm', required: false })
   @IsString()
   @IsOptional()
   beneficiarioId?: string;

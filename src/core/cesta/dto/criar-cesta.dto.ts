@@ -7,7 +7,7 @@ export class CriarCestaDto {
   @IsNotEmpty()
   nome: string;
 
-  @ApiProperty({ example: 'Cesta básica média' })
+  @ApiProperty({ example: 'Cesta básica média', required: false })
   @IsString()
   @IsOptional()
   descricao?: string;
