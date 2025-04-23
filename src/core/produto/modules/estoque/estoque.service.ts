@@ -136,8 +136,8 @@ export class EstoqueService {
     const nome = filtros.nome ?? '';
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 10;
-    const dataInicio = filtros.dataInicio ? filtros.dataInicio : undefined;
-    const dataFim = filtros.dataFim ? filtros.dataFim : undefined;
+    const dataInicio = filtros.dataInicio ?? undefined;
+    const dataFim = filtros.dataFim ?? undefined;
 
     const where: Prisma.ProdutoMovimentacaoEstoqueWhereInput = {
       produtoEstoque: {
@@ -161,7 +161,10 @@ export class EstoqueService {
     };
 
     if (tipo) {
-      where.tipo = tipo;
+      where.tipo = {
+        contains: tipo,
+        mode: 'insensitive',
+      };
     }
 
     const movimentacoes = await this.prismaService.produtoMovimentacaoEstoque.findMany({
@@ -205,8 +208,8 @@ export class EstoqueService {
     const nome = filtros.nome ?? '';
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 15;
-    const dataInicio = filtros.dataInicio ? filtros.dataInicio : undefined;
-    const dataFim = filtros.dataFim ? filtros.dataFim : undefined;
+    const dataInicio = filtros.dataInicio ?? undefined;
+    const dataFim = filtros.dataFim ?? undefined;
 
     const where: Prisma.ProdutoMovimentacaoEstoqueWhereInput = {
       produtoEstoque: {
