@@ -194,8 +194,8 @@ export class DistribuicaoCestaService {
   async listarHistoricoDistribuicoes(filtros: ListarHistoricoDistribuicoesDto) {
     const { tipoCestaId, mes, ano } = filtros;
     const nome = filtros.nome ?? '';
-    const dataInicio = startOfMonth(new Date(ano, mes - 1));
-    const dataFim = endOfMonth(new Date(ano, mes - 1));
+    const dataInicio = startOfMonth(new Date(ano, mes));
+    const dataFim = endOfMonth(new Date(ano, mes));
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 15;
 

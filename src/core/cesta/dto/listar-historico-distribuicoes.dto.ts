@@ -3,10 +3,10 @@ import { IsInt, IsNotEmpty, IsNumberString, IsOptional, IsString, Max, Min } fro
 import { Transform } from 'class-transformer';
 
 export class ListarHistoricoDistribuicoesDto {
-  @ApiProperty({ example: 4, description: 'Mês (1-12)' })
+  @ApiProperty({ example: 4, description: 'Mês (0-12)' })
   @IsNotEmpty()
   @IsInt()
-  @Min(1)
+  @Min(0)
   @Max(12)
   @Transform(({ value }) => +value)
   mes: number;
