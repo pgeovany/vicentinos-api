@@ -109,6 +109,11 @@ export class ComposicaoCestaService {
             },
             quantidade: true,
           },
+          orderBy: {
+            produto: {
+              nome: 'asc',
+            },
+          },
         },
       },
     });
