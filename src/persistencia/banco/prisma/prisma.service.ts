@@ -17,6 +17,9 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
       console.log('Conectando ao Banco de Dados');
       PrismaService.instance = new PrismaClient({
         log: ['warn', 'error'],
+        transactionOptions: {
+          timeout: 20000,
+        },
       });
       PrismaService.instance.$connect();
     }
