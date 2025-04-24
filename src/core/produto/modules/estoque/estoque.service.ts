@@ -384,7 +384,7 @@ export class EstoqueService {
     }));
 
     return {
-      produtos: [...analise].sort((a, b) => a.nome.localeCompare(b.nome)),
+      produtos: [...analise].sort((a, b) => a.saldo - b.saldo),
       totais: {
         produtosInsuficientes: analise.filter((p) => !p.suficiente).length,
         produtosSuficientes: analise.filter((p) => p.suficiente).length,
