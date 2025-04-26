@@ -8,6 +8,7 @@ import { Prisma } from '@prisma/client';
 import { ListarEntradasESaidas } from './dto/listar-quantidade-movimentacoes.dto';
 import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE, isEntrada, isSaida } from 'src/utils/enum/estoque.enum';
 import { ENUM_STATUS_BENEFICIARIO } from 'src/utils/enum/beneficiario.enum';
+import { RemocaoDiretaEstoqueDto } from './dto/remocao-direta.dto';
 
 @Injectable()
 export class EstoqueService {
@@ -319,5 +320,18 @@ export class EstoqueService {
         produtosSuficientes: analise.filter((p) => p.suficiente).length,
       },
     };
+  }
+
+  async remocaoDireta(params: RemocaoDiretaEstoqueDto) {
+    const { produtoId, quantidade, motivo } = params;
+
+    await this.produtoService.buscarPorId(produtoId);
+
+    await this.movimentar({
+      produtoId,
+      quantidade,
+      tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_MANUAL,
+      motivo,
+    });
   }
 }

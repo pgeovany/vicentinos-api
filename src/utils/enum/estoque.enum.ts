@@ -1,9 +1,10 @@
 export enum ENUM_TIPO_MOVIMENTACAO_ESTOQUE {
   ENTRADA_DOACAO = 'ENTRADA_DOACAO', // Recebimento de doações
-  ENTRADA_AJUSTE = 'ENTRADA_AJUSTE', // Ajustes manuais
+  ENTRADA_AJUSTE = 'ENTRADA_AJUSTE', // Ajustes automáticos
   SAIDA_CESTAS = 'SAIDA_CESTAS', // Distribuição regular de cestas
   SAIDA_EMERGENCIAL = 'SAIDA_EMERGENCIAL', // Distribuições pontuais/emergenciais
-  SAIDA_AJUSTE = 'SAIDA_AJUSTE', // Ajustes manuais
+  SAIDA_AJUSTE = 'SAIDA_AJUSTE', // Ajustes automáticos
+  SAIDA_MANUAL = 'SAIDA_MANUAL', // Ajustes manuais
 }
 
 export const isEntrada = (tipo: string): boolean => {

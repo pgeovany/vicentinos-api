@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Query, UseGuards } from '@nestjs/common';
 import { EstoqueService } from './estoque.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Doc } from 'src/utils/docs/doc';
@@ -10,6 +10,7 @@ import {
   ListarMovimentacoesEstoqueResponseDto,
 } from './doc/estoque.response.dto';
 import { ListarEntradasESaidas } from './dto/listar-quantidade-movimentacoes.dto';
+import { RemocaoDiretaEstoqueDto } from './dto/remocao-direta.dto';
 
 @ApiTags('Produto/Estoque')
 @UseGuards(JwtAuthGuard)
@@ -44,5 +45,14 @@ export class EstoqueController {
   @Get('/analise-estoque')
   async analisarEstoque() {
     return await this.estoqueService.analisarEstoque();
+  }
+
+  @Doc({
+    nome: 'Remoção direta de estoque',
+    descricao: 'Apenas para ser utilizado em casos excepcionais, como vencimento de produtos',
+  })
+  @Put('/ajuste-manual')
+  async ajustarEstoque(@Body() params: RemocaoDiretaEstoqueDto) {
+    return await this.estoqueService.remocaoDireta(params);
   }
 }
