@@ -97,6 +97,7 @@ export class DistribuicaoCestaService {
           produtoId: produto.produtoId,
           quantidade: produto.quantidade,
           tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_CESTAS,
+          motivo: 'Entrega de cesta',
         });
       }
 

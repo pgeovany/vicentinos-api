@@ -51,7 +51,7 @@ export class DistribuicaoEmergencialService {
       for (const item of itens) {
         await this.estoqueService.movimentar({
           prisma,
-          motivo,
+          motivo: motivo ?? 'Assistência SOS',
           produtoId: item.produtoId,
           quantidade: item.quantidade,
           tipo: ENUM_TIPO_MOVIMENTACAO_ESTOQUE.SAIDA_EMERGENCIAL,
