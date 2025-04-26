@@ -7,6 +7,8 @@ import { ResponseInterceptor } from './utils/response.interceptor';
 import { customCss } from './utils/cssDocs';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import * as cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -43,6 +45,16 @@ async function bootstrap() {
   );
 
   app.use(cookieParser());
+
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 150, // Limit each IP to 100 requests per windowMs
+      message: 'Muitas requisições, tente novamente mais tarde.',
+    }),
+  );
+
+  app.use(helmet());
 
   app.useGlobalPipes(
     new ValidationPipe({
