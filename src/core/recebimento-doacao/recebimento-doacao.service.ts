@@ -8,6 +8,7 @@ import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE } from 'src/utils/enum/estoque.enum';
 import { ListarDoacoesDto } from './dto/listar-doacoes.dto';
 import { Prisma } from '@prisma/client';
 import { ObterEstatisticasDoacoesDto } from './dto/obter-estatisticas-doacoes.dto';
+import { EstatisticasDoacoesResponseDto } from './doc/recebimento-doacao.response.dto';
 
 @Injectable()
 export class RecebimentoDoacaoService {
@@ -166,10 +167,12 @@ export class RecebimentoDoacaoService {
     };
   }
 
-  async obterEstatisticas(params: ObterEstatisticasDoacoesDto) {
+  async obterEstatisticas(
+    params: ObterEstatisticasDoacoesDto,
+  ): Promise<EstatisticasDoacoesResponseDto> {
     const origem = params.origem ?? undefined;
-    const dataInicio = params.dataInicio ? params.dataInicio : undefined;
-    const dataFim = params.dataFim ? params.dataFim : undefined;
+    const dataInicio = params.dataInicio ?? undefined;
+    const dataFim = params.dataFim ?? undefined;
 
     const where: Prisma.RecebimentoDoacaoWhereInput = {
       origem,
@@ -221,8 +224,8 @@ export class RecebimentoDoacaoService {
     });
 
     return {
-      dataInicio,
-      dataFim,
+      dataInicio: dataInicio,
+      dataFim: dataFim,
       totalDoacoes,
       totalItensDoados: totalItens._sum.quantidade ?? 0,
       mediaItensPorDoacao: totalDoacoes ? (totalItens._sum.quantidade ?? 0) / totalDoacoes : 0,

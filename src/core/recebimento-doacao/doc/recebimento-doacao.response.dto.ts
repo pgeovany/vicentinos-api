@@ -66,10 +66,10 @@ class ProdutoDoacaoEstatisticaResponseDto {
 
 export class EstatisticasDoacoesResponseDto {
   @ApiProperty({ example: '2023-12-31T03:00:00.000Z' })
-  dataInicio?: string;
+  dataInicio?: Date;
 
   @ApiProperty({ example: '2025-10-01T02:59:59.999Z' })
-  dataFim?: string;
+  dataFim?: Date;
 
   @ApiProperty({ example: 100 })
   totalDoacoes: number;
@@ -84,5 +84,5 @@ export class EstatisticasDoacoesResponseDto {
   totalPorOrigem: TotalPorOrigem[];
 
   @ApiProperty({ type: [ProdutoDoacaoEstatisticaResponseDto] })
-  produtos: ProdutoDoacaoEstatisticaResponseDto[];
+  quantidadePorProduto: ProdutoDoacaoEstatisticaResponseDto[];
 }
