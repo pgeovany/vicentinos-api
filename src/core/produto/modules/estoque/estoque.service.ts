@@ -325,8 +325,6 @@ export class EstoqueService {
   async remocaoDireta(params: RemocaoDiretaEstoqueDto) {
     const { produtoId, quantidade, motivo } = params;
 
-    await this.produtoService.buscarPorId(produtoId);
-
     await this.movimentar({
       produtoId,
       quantidade,
