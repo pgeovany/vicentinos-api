@@ -51,8 +51,8 @@ export class EstoqueController {
     nome: 'Remoção direta de estoque',
     descricao: 'Apenas para ser utilizado em casos excepcionais, como vencimento de produtos',
   })
-  @Put('/ajuste-manual')
-  async ajustarEstoque(@Body() params: RemocaoDiretaEstoqueDto) {
+  @Put('/remocao-direta')
+  async remocaoDireta(@Body() params: RemocaoDiretaEstoqueDto) {
     return await this.estoqueService.remocaoDireta(params);
   }
 }
