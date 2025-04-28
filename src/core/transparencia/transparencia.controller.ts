@@ -1,10 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseInterceptors } from '@nestjs/common';
 import { TransparenciaService } from './transparencia.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Doc } from 'src/utils/docs/doc';
 import { TransparenciaResponseDto } from './doc/transparencia.response.dto';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('[PÚBLICO] - Transparência')
+@UseInterceptors(CacheInterceptor)
 @Controller('transparencia')
 export class TransparenciaController {
   constructor(private readonly transparenciaService: TransparenciaService) {}
@@ -15,6 +17,8 @@ export class TransparenciaController {
     resposta: TransparenciaResponseDto,
   })
   @Get('/obter-dados')
+  @CacheKey('familias-ajudadas-ultimo-mes')
+  @CacheTTL(60 * 60 * 24) // 24 horas
   async obterDados() {
     return await this.transparenciaService.obterDados();
   }
