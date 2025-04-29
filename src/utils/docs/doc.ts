@@ -1,19 +1,36 @@
 import { applyDecorators, HttpStatus } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiExtraModels,
+  getSchemaPath,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 export function Doc(params: {
   nome: string;
   descricao?: string;
   status?: HttpStatus;
-  resposta?: Function;
+  resposta?: Function; // eslint-disable-line @typescript-eslint/ban-types
+  array?: boolean;
+  auth?: boolean;
 }) {
   const statusCode = params.status ?? HttpStatus.OK;
+  const requiresAuth = params.auth ?? true;
+
+  const decorators = [
+    ApiOperation({
+      summary: params.nome,
+      description: params.descricao,
+    }),
+  ];
+
+  if (requiresAuth) {
+    decorators.push(ApiBearerAuth());
+  }
+
   if (!params.resposta) {
-    return applyDecorators(
-      ApiOperation({
-        summary: params.nome,
-        description: params.descricao,
-      }),
+    decorators.push(
       ApiResponse({
         status: statusCode,
         schema: {
@@ -28,13 +45,10 @@ export function Doc(params: {
         },
       }),
     );
+    return applyDecorators(...decorators);
   }
 
-  return applyDecorators(
-    ApiOperation({
-      summary: params.nome,
-      description: params.descricao,
-    }),
+  decorators.push(
     ApiExtraModels(params.resposta),
     ApiResponse({
       status: statusCode,
@@ -47,13 +61,20 @@ export function Doc(params: {
                 type: 'string',
                 example: 'Operação realizada com sucesso',
               },
-              data: {
-                $ref: getSchemaPath(params.resposta),
-              },
+              data: params.array
+                ? {
+                    type: 'array',
+                    items: { $ref: getSchemaPath(params.resposta) },
+                  }
+                : {
+                    $ref: getSchemaPath(params.resposta),
+                  },
             },
           },
         ],
       },
     }),
   );
+
+  return applyDecorators(...decorators);
 }

@@ -15,6 +15,7 @@ export class TransparenciaController {
     nome: 'Buscar dados de transparência',
     descricao: 'Retorna dados sobre quantidade de produtos recebidos, familias ajudadas e etc',
     resposta: TransparenciaResponseDto,
+    auth: false,
   })
   @Get('/obter-dados')
   @CacheKey('familias-ajudadas-ultimo-mes')

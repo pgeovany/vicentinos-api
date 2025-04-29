@@ -16,6 +16,7 @@ export class EstoquePublicController {
     descricao:
       'Retorna a lista dos produtos mais necessitados, de acordo com as quantidades em estoque e quantidades reservadas.',
     resposta: ListarProdutosMaisNecessitadosResponseDto,
+    auth: false,
   })
   @Get('/')
   @CacheKey('produtos-mais-necessitados')
