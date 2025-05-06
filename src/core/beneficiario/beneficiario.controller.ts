@@ -5,7 +5,10 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AtualizarEnderecoBeneficiarioDto } from './dto/atualizar-endereco-beneficiario.dto';
 import { AtualizarTipoCestaDto } from './dto/atualizar-tipo-cesta-beneficiario.dto';
 import { CriarBeneficiarioDto } from './dto/criar-beneficiario.dto';
-import { AdicionarDependentesBeneficiarioDto } from './dto/adicionar-dependente-beneficiario.dto';
+import {
+  AdicionarDependentesBeneficiarioDto,
+  EditarDependenteDto,
+} from './dto/adicionar-dependente-beneficiario.dto';
 import { ListarBeneficiariosDto } from './dto/listar-beneficiarios.dto';
 import { Doc } from 'src/utils/docs/doc';
 import {
@@ -13,6 +16,10 @@ import {
   BeneficiarioResponseDto,
   ListarBeneficiariosResponseDto,
 } from './doc/beneficiario.response.dto';
+import { CriarDesligamentoBeneficiarioDto } from './dto/criar-desligamento-beneficiario.dto';
+import { AtualizarBeneficiosSociaisBeneficiarioDto } from './dto/atualizar-beneficios-sociais-beneficiario.dto';
+import { AtualizarSaudeBeneficiarioDto } from './dto/atualizar-saude-beneficiario.dto';
+import { AtualizarInteressesBeneficiarioDto } from './dto/atualizar-interesses-beneficiario.dto';
 
 @ApiTags('Beneficiário')
 @UseGuards(JwtAuthGuard)
@@ -66,6 +73,45 @@ export class BeneficiarioController {
   }
 
   @Doc({
+    nome: 'Atualizar benefícios sociais',
+    descricao: 'Atualiza as informações de benefícios sociais do beneficiário',
+    resposta: BeneficiarioResponseDto,
+  })
+  @Put('/:beneficiarioId/beneficios-sociais')
+  async atualizarBeneficiosSociais(
+    @Param('beneficiarioId') beneficiarioId: string,
+    @Body() data: AtualizarBeneficiosSociaisBeneficiarioDto,
+  ) {
+    return await this.beneficiarioService.atualizarBeneficiosSociais({ beneficiarioId, data });
+  }
+
+  @Doc({
+    nome: 'Atualizar informações de saúde',
+    descricao: 'Atualiza as informações de saúde do beneficiário',
+    resposta: BeneficiarioResponseDto,
+  })
+  @Put('/:beneficiarioId/saude')
+  async atualizarSaude(
+    @Param('beneficiarioId') beneficiarioId: string,
+    @Body() data: AtualizarSaudeBeneficiarioDto,
+  ) {
+    return await this.beneficiarioService.atualizarSaude({ beneficiarioId, data });
+  }
+
+  @Doc({
+    nome: 'Atualizar interesses',
+    descricao: 'Atualiza as informações de interesses do beneficiário',
+    resposta: BeneficiarioResponseDto,
+  })
+  @Put('/:beneficiarioId/interesses')
+  async atualizarInteresses(
+    @Param('beneficiarioId') beneficiarioId: string,
+    @Body() data: AtualizarInteressesBeneficiarioDto,
+  ) {
+    return await this.beneficiarioService.atualizarInteresses({ beneficiarioId, data });
+  }
+
+  @Doc({
     nome: 'Adicionar dependentes',
     descricao: 'Adiciona um ou mais dependentes ao beneficiário',
     resposta: BeneficiarioResponseDto,
@@ -76,6 +122,20 @@ export class BeneficiarioController {
     @Body() data: AdicionarDependentesBeneficiarioDto,
   ) {
     return await this.beneficiarioService.adicionarDependentes({ beneficiarioId, data });
+  }
+
+  @Doc({
+    nome: 'Adicionar dependentes',
+    descricao: 'Adiciona um ou mais dependentes ao beneficiário',
+    resposta: BeneficiarioResponseDto,
+  })
+  @Put('/:beneficiarioId/dependentes/:dependenteId')
+  async editarDependente(
+    @Param('beneficiarioId') beneficiarioId: string,
+    @Param('dependenteId') dependenteId: string,
+    @Body() data: EditarDependenteDto,
+  ) {
+    return await this.beneficiarioService.editarDependente({ beneficiarioId, dependenteId, data });
   }
 
   @Doc({
@@ -110,11 +170,14 @@ export class BeneficiarioController {
   }
 
   @Doc({
-    nome: 'Alterar status',
-    descricao: 'Altera o status do beneficiário',
+    nome: 'Inativar beneficiário',
+    descricao: 'Desativa o cadastro do beneficiário',
   })
-  @Put('/:beneficiarioId/status')
-  async alterarStatus(@Param('beneficiarioId') beneficiarioId: string) {
-    return await this.beneficiarioService.alterarStatus(beneficiarioId);
+  @Delete('/:beneficiarioId/inativar')
+  async desligarBeneficiario(
+    @Param('beneficiarioId') beneficiarioId: string,
+    @Body() data: CriarDesligamentoBeneficiarioDto,
+  ) {
+    return await this.beneficiarioService.desligarBeneficiario({ beneficiarioId, data });
   }
 }

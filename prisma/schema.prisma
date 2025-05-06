@@ -150,21 +150,28 @@ model ProdutoCesta {
 }
 
 model Beneficiario {
-  id                String    @id @default(cuid())
-  status            String    @default("ATIVO")
-  motivoDesativacao String?
-  nome              String
-  cpf               String?   @unique
-  rg                String?   @unique
-  dataNascimento    DateTime? @map("data_nascimento")
-  telefone          String?
-  email             String?
-  tipoCestaId       String?   @map("tipo_cesta_id")
+  id                   String    @id @default(cuid())
+  status               String    @default("ATIVO")
+  nome                 String
+  cpf                  String?   @unique
+  rg                   String?   @unique
+  sexo                 String
+  dataNascimento       DateTime? @map("data_nascimento")
+  telefone             String?
+  estadoCivil          String?   @map("estado_civil")
+  profissao            String?
+  rendaMensal          String?
+  pessoaComDeficiencia Boolean   @default(false) @map("pessoa_com_deficiencia")
+  tipoCestaId          String?   @map("tipo_cesta_id")
 
-  tipoCesta             TipoCesta?               @relation(fields: [tipoCestaId], references: [id], onDelete: SetNull)
-  endereco              EnderecoBeneficiario?
-  dependentes           DependenteBeneficiario[]
-  historicoRecebimentos HistoricoDistribuicao[]
+  tipoCesta              TipoCesta?                     @relation(fields: [tipoCestaId], references: [id], onDelete: SetNull)
+  endereco               EnderecoBeneficiario?
+  beneficiosSociais      BeneficiosSociaisBeneficiario?
+  saude                  SaudeBeneficiario?
+  interesses             InteressesBeneficiario?
+  dependentes            DependenteBeneficiario[]
+  historicoRecebimentos  HistoricoDistribuicao[]
+  historicoDesligamentos DesligamentoBeneficiario[]
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -173,14 +180,29 @@ model Beneficiario {
 }
 
 model EnderecoBeneficiario {
-  id             String  @id @default(cuid())
-  beneficiarioId String  @unique @map("beneficiario_id")
-  rua            String?
-  numero         String?
-  bairro         String?
-  cidade         String?
-  cep            String?
-  complemento    String?
+  id              String  @id @default(cuid())
+  beneficiarioId  String  @unique @map("beneficiario_id")
+  rua             String?
+  numero          String?
+  bairro          String?
+  cidade          String?
+  cep             String?
+  complemento     String?
+  pontoReferencia String? @map("ponto_referencia")
+  numeroComodos   Int     @map("numero_comodos")
+
+  proprio        Boolean @default(false)
+  financiado     Boolean @default(false)
+  alugado        Boolean @default(false)
+  cedido         Boolean @default(false)
+  heranca        Boolean @default(false)
+  programaSocial Boolean @default(false)
+  ocupacao       Boolean @default(false)
+
+  banheiro        Boolean @default(true)
+  aguaEncanada    Boolean @default(true) @map("agua_encanada")
+  energiaEletrica Boolean @default(true) @map("energia_eletrica")
+  esgoto          Boolean @default(true)
 
   beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id], onDelete: Cascade)
 
@@ -190,16 +212,101 @@ model EnderecoBeneficiario {
   @@map("endereco_beneficiario")
 }
 
+model BeneficiosSociaisBeneficiario {
+  id                          String  @id @default(cuid())
+  beneficiarioId              String  @unique() @map("beneficiario_id")
+  bolsaFamilia                Boolean @default(false) @map("bolsa_familia")
+  cadUnico                    Boolean @default(false) @map("cad_unico")
+  loas                        Boolean @default(false)
+  carteiraIdoso               Boolean @default(false) @map("carteira_idoso")
+  cartaoFamiliaCarioca        Boolean @default(false) @map("cartao_familia_carioca")
+  minhaCasaMinhaVida          Boolean @default(false) @map("minha_casa_minha_vida")
+  paif                        Boolean @default(false)
+  pronatec                    Boolean @default(false)
+  aposentadoria               Boolean @default(false)
+  isencaoConcursoPublico      Boolean @default(false) @map("isencao_concurso_publico")
+  cadastroParaEmprego         Boolean @default(false) @map("cadastro_para_emprego")
+  tarifaSocialEnergiaEletrica Boolean @default(false) @map("tarifa_social_energia_eletrica")
+  outrosBeneficios            String? @map("outros_beneficios")
+  observacao                  String?
+
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id], onDelete: Cascade)
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("beneficios_sociais_beneficiario")
+}
+
+model SaudeBeneficiario {
+  id                   String   @id @default(cuid())
+  beneficiarioId       String   @unique() @map("beneficiario_id")
+  cartaoSUS            Boolean?
+  numeroCartaoSUS      String?
+  clinicaFamilia       String?
+  postoSaude           String?
+  tratamentoHospitalar Boolean?
+  hospital             String?
+  tratamentoSaude      String?
+  medicamentos         String?
+  observacao           String?
+
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id], onDelete: Cascade)
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("saude_beneficiario")
+}
+
+model InteressesBeneficiario {
+  id                  String  @id @default(cuid())
+  beneficiarioId      String  @unique() @map("beneficiario_id")
+  // Palestras
+  programasSociais    Boolean @default(false) @map("programas_sociais")
+  violenciaDomestica  Boolean @default(false) @map("violencia_domestica")
+  dependenciaQuimica  Boolean @default(false) @map("dependencia_quimica")
+  meioAmbiente        Boolean @default(false) @map("meio_ambiente")
+  documentacaoPessoal Boolean @default(false) @map("documentacao_pessoal")
+  saudeGeral          Boolean @default(false) @map("saude_geral")
+  empreendedorismo    Boolean @default(false) @map("empreendedorismo")
+  sustentabilidade    Boolean @default(false) @map("sustentabilidade")
+  // Cursos
+  pinturaEmTecido     Boolean @default(false) @map("pintura_em_tecido")
+  bijuteria           Boolean @default(false)
+  cestaria            Boolean @default(false)
+  costura             Boolean @default(false)
+  bordado             Boolean @default(false)
+  croche              Boolean @default(false)
+  trico               Boolean @default(false)
+  teatro              Boolean @default(false)
+  reciclagem          Boolean @default(false)
+  informatica         Boolean @default(false)
+  cursos              Boolean @default(false)
+  alfabetizacao       Boolean @default(false)
+
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id], onDelete: Cascade)
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("interesses_beneficiario")
+}
+
 model DependenteBeneficiario {
-  id             String    @id @default(cuid())
-  beneficiarioId String    @map("beneficiario_id")
-  nome           String
-  cpf            String?
-  rg             String?
-  dataNascimento DateTime? @map("data_nascimento")
-  telefone       String?
-  email          String?
-  parentesco     String?
+  id                 String    @id @default(cuid())
+  beneficiarioId     String    @map("beneficiario_id")
+  nome               String
+  cpf                String?
+  rg                 String?
+  certidaoNascimento String?   @map("certidao_nascimento")
+  parentesco         String
+  escolaridade       String?
+  sexo               String
+  dataNascimento     DateTime? @map("data_nascimento")
+  rendaMensal        String?
+  trabalho           String?
+  observacao         String?
 
   beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id], onDelete: Cascade)
 
@@ -207,6 +314,20 @@ model DependenteBeneficiario {
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
   @@map("dependente_beneficiario")
+}
+
+model DesligamentoBeneficiario {
+  id               String    @id @default(cuid())
+  beneficiarioId   String?   @map("beneficiario_id")
+  motivo           String?
+  dataDesligamento DateTime? @map("data_desligamento")
+
+  beneficiario Beneficiario? @relation(fields: [beneficiarioId], references: [id], onDelete: SetNull)
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("desligamento_beneficiario")
 }
 
 model HistoricoDistribuicao {

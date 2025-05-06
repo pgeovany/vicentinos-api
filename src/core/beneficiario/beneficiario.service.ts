@@ -4,9 +4,16 @@ import { AppErrorConflict, AppErrorNotFound } from 'src/utils/errors/app-errors'
 import { AtualizarEnderecoBeneficiarioDto } from './dto/atualizar-endereco-beneficiario.dto';
 import { CriarBeneficiarioDto } from './dto/criar-beneficiario.dto';
 import { ENUM_STATUS_BENEFICIARIO } from 'src/utils/enum/beneficiario.enum';
-import { AdicionarDependentesBeneficiarioDto } from './dto/adicionar-dependente-beneficiario.dto';
+import {
+  AdicionarDependentesBeneficiarioDto,
+  EditarDependenteDto,
+} from './dto/adicionar-dependente-beneficiario.dto';
 import { ListarBeneficiariosDto } from './dto/listar-beneficiarios.dto';
 import { Prisma } from '@prisma/client';
+import { AtualizarBeneficiosSociaisBeneficiarioDto } from './dto/atualizar-beneficios-sociais-beneficiario.dto';
+import { AtualizarSaudeBeneficiarioDto } from './dto/atualizar-saude-beneficiario.dto';
+import { AtualizarInteressesBeneficiarioDto } from './dto/atualizar-interesses-beneficiario.dto';
+import { CriarDesligamentoBeneficiarioDto } from './dto/criar-desligamento-beneficiario.dto';
 
 @Injectable()
 export class BeneficiarioService {
@@ -54,14 +61,6 @@ export class BeneficiarioService {
       data: {
         ...rest,
       },
-      select: {
-        id: true,
-        nome: true,
-        cpf: true,
-        dataNascimento: true,
-        telefone: true,
-        email: true,
-      },
     });
   }
 
@@ -78,7 +77,6 @@ export class BeneficiarioService {
         status: true,
         dataNascimento: true,
         telefone: true,
-        email: true,
         endereco: true,
         tipoCesta: {
           select: {
@@ -109,17 +107,11 @@ export class BeneficiarioService {
       where: {
         id: beneficiarioId,
       },
-      select: {
-        id: true,
-        nome: true,
-        status: true,
-        cpf: true,
-        rg: true,
-        dataNascimento: true,
-        telefone: true,
-        email: true,
+      include: {
+        beneficiosSociais: true,
         endereco: true,
-        criadoEm: true,
+        interesses: true,
+        saude: true,
         tipoCesta: {
           select: {
             id: true,
@@ -127,12 +119,6 @@ export class BeneficiarioService {
           },
         },
         dependentes: {
-          select: {
-            id: true,
-            nome: true,
-            parentesco: true,
-            dataNascimento: true,
-          },
           orderBy: { nome: 'asc' },
         },
         historicoRecebimentos: {
@@ -140,6 +126,14 @@ export class BeneficiarioService {
             id: true,
             tipoCestaId: true,
             nomeCesta: true,
+            criadoEm: true,
+          },
+          orderBy: { criadoEm: 'desc' },
+        },
+        historicoDesligamentos: {
+          select: {
+            id: true,
+            motivo: true,
             criadoEm: true,
           },
           orderBy: { criadoEm: 'desc' },
@@ -180,14 +174,9 @@ export class BeneficiarioService {
       data: {
         ...rest,
         endereco: {},
-      },
-      select: {
-        id: true,
-        nome: true,
-        cpf: true,
-        dataNascimento: true,
-        telefone: true,
-        email: true,
+        beneficiosSociais: {},
+        saude: {},
+        interesses: {},
       },
     });
   }
@@ -216,7 +205,6 @@ export class BeneficiarioService {
           rg: true,
           dataNascimento: true,
           telefone: true,
-          email: true,
           status: true,
           endereco: true,
           criadoEm: true,
@@ -277,6 +265,72 @@ export class BeneficiarioService {
     return await this.buscarPorId(beneficiarioId);
   }
 
+  async atualizarBeneficiosSociais(params: {
+    beneficiarioId: string;
+    data: AtualizarBeneficiosSociaisBeneficiarioDto;
+  }) {
+    const { beneficiarioId, data } = params;
+
+    await this.buscarPorId(beneficiarioId);
+
+    await this.prismaService.beneficiario.update({
+      where: { id: beneficiarioId },
+      data: {
+        beneficiosSociais: {
+          upsert: {
+            create: data,
+            update: data,
+          },
+        },
+      },
+    });
+
+    return await this.buscarPorId(beneficiarioId);
+  }
+
+  async atualizarSaude(params: { beneficiarioId: string; data: AtualizarSaudeBeneficiarioDto }) {
+    const { beneficiarioId, data } = params;
+
+    await this.buscarPorId(beneficiarioId);
+
+    await this.prismaService.beneficiario.update({
+      where: { id: beneficiarioId },
+      data: {
+        saude: {
+          upsert: {
+            create: data,
+            update: data,
+          },
+        },
+      },
+    });
+
+    return await this.buscarPorId(beneficiarioId);
+  }
+
+  async atualizarInteresses(params: {
+    beneficiarioId: string;
+    data: AtualizarInteressesBeneficiarioDto;
+  }) {
+    const { beneficiarioId, data } = params;
+
+    await this.buscarPorId(beneficiarioId);
+
+    await this.prismaService.beneficiario.update({
+      where: { id: beneficiarioId },
+      data: {
+        interesses: {
+          upsert: {
+            create: data,
+            update: data,
+          },
+        },
+      },
+    });
+
+    return await this.buscarPorId(beneficiarioId);
+  }
+
   async adicionarDependentes(params: {
     beneficiarioId: string;
     data: AdicionarDependentesBeneficiarioDto;
@@ -298,6 +352,27 @@ export class BeneficiarioService {
     );
 
     return await this.buscarPorId(beneficiarioId);
+  }
+
+  async editarDependente(params: {
+    beneficiarioId: string;
+    dependenteId: string;
+    data: EditarDependenteDto;
+  }) {
+    const { beneficiarioId, dependenteId, data } = params;
+    const beneficiario = await this.buscarPorId(beneficiarioId);
+    const dependente = beneficiario.dependentes.find((d) => d.id === dependenteId);
+
+    if (!dependente) {
+      throw new AppErrorNotFound('Dependente não encontrado');
+    }
+
+    await this.prismaService.dependenteBeneficiario.update({
+      where: {
+        id: dependenteId,
+      },
+      data,
+    });
   }
 
   async removerDependente(params: { beneficiarioId: string; dependenteId: string }) {
@@ -345,17 +420,29 @@ export class BeneficiarioService {
     return await this.buscarPorId(beneficiarioId);
   }
 
-  async alterarStatus(beneficiarioId: string) {
+  async desligarBeneficiario(params: {
+    beneficiarioId: string;
+    data: CriarDesligamentoBeneficiarioDto;
+  }) {
+    const { beneficiarioId, data } = params;
     const beneficiario = await this.buscarPorId(beneficiarioId);
 
-    const novoStatus =
-      beneficiario.status === ENUM_STATUS_BENEFICIARIO.ATIVO
-        ? ENUM_STATUS_BENEFICIARIO.INATIVO
-        : ENUM_STATUS_BENEFICIARIO.ATIVO;
+    if (beneficiario.status === ENUM_STATUS_BENEFICIARIO.INATIVO) {
+      throw new AppErrorConflict('Beneficiário já está inativo');
+    }
 
-    await this.prismaService.beneficiario.update({
-      where: { id: beneficiarioId },
-      data: { status: novoStatus },
-    });
+    await this.prismaService.$transaction([
+      this.prismaService.beneficiario.update({
+        where: { id: beneficiarioId },
+        data: { status: ENUM_STATUS_BENEFICIARIO.INATIVO },
+      }),
+      this.prismaService.desligamentoBeneficiario.create({
+        data: {
+          beneficiarioId,
+          motivo: data.motivo,
+          dataDesligamento: new Date(),
+        },
+      }),
+    ]);
   }
 }
