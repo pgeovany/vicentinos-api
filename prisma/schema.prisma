@@ -318,11 +318,11 @@ model DependenteBeneficiario {
 
 model DesligamentoBeneficiario {
   id               String    @id @default(cuid())
-  beneficiarioId   String?   @map("beneficiario_id")
+  beneficiarioId   String    @map("beneficiario_id")
   motivo           String?
   dataDesligamento DateTime? @map("data_desligamento")
 
-  beneficiario Beneficiario? @relation(fields: [beneficiarioId], references: [id], onDelete: SetNull)
+  beneficiario Beneficiario @relation(fields: [beneficiarioId], references: [id], onDelete: Cascade)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
