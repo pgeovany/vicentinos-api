@@ -52,7 +52,6 @@ export class BeneficiarioController {
     nome: 'Criar beneficiário',
     descricao:
       'Cria um novo beneficiário com dados básicos. Caso beneficiarioId seja enviado, atualiza os dados do beneficiário',
-    resposta: BeneficiarioResponseDto,
   })
   @Post('/')
   async criar(@Body() dto: CriarBeneficiarioDto) {
@@ -62,7 +61,6 @@ export class BeneficiarioController {
   @Doc({
     nome: 'Atualizar endereço',
     descricao: 'Atualiza o endereço de um beneficiário',
-    resposta: BeneficiarioResponseDto,
   })
   @Put('/:beneficiarioId/endereco')
   async atualizarEndereco(
@@ -75,7 +73,6 @@ export class BeneficiarioController {
   @Doc({
     nome: 'Atualizar benefícios sociais',
     descricao: 'Atualiza as informações de benefícios sociais do beneficiário',
-    resposta: BeneficiarioResponseDto,
   })
   @Put('/:beneficiarioId/beneficios-sociais')
   async atualizarBeneficiosSociais(
@@ -88,7 +85,6 @@ export class BeneficiarioController {
   @Doc({
     nome: 'Atualizar informações de saúde',
     descricao: 'Atualiza as informações de saúde do beneficiário',
-    resposta: BeneficiarioResponseDto,
   })
   @Put('/:beneficiarioId/saude')
   async atualizarSaude(
@@ -101,7 +97,6 @@ export class BeneficiarioController {
   @Doc({
     nome: 'Atualizar interesses',
     descricao: 'Atualiza as informações de interesses do beneficiário',
-    resposta: BeneficiarioResponseDto,
   })
   @Put('/:beneficiarioId/interesses')
   async atualizarInteresses(
@@ -114,7 +109,6 @@ export class BeneficiarioController {
   @Doc({
     nome: 'Adicionar dependentes',
     descricao: 'Adiciona um ou mais dependentes ao beneficiário',
-    resposta: BeneficiarioResponseDto,
   })
   @Post('/:beneficiarioId/dependentes')
   async adicionarDependentes(
@@ -125,9 +119,7 @@ export class BeneficiarioController {
   }
 
   @Doc({
-    nome: 'Adicionar dependentes',
-    descricao: 'Adiciona um ou mais dependentes ao beneficiário',
-    resposta: BeneficiarioResponseDto,
+    nome: 'Editar dependente',
   })
   @Put('/:beneficiarioId/dependentes/:dependenteId')
   async editarDependente(
@@ -140,7 +132,6 @@ export class BeneficiarioController {
 
   @Doc({
     nome: 'Remover dependente',
-    descricao: 'Remove um dependente do beneficiário',
   })
   @Delete('/:beneficiarioId/dependentes/:dependenteId')
   async removerMembro(
@@ -156,7 +147,6 @@ export class BeneficiarioController {
   @Doc({
     nome: 'Atualizar tipo de cesta',
     descricao: 'Define ou atualiza o tipo de cesta do beneficiário',
-    resposta: BeneficiarioResponseDto,
   })
   @Put('/:beneficiarioId/tipo-cesta')
   async atualizarTipoCesta(

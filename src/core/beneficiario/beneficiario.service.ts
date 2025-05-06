@@ -14,6 +14,10 @@ import { AtualizarBeneficiosSociaisBeneficiarioDto } from './dto/atualizar-benef
 import { AtualizarSaudeBeneficiarioDto } from './dto/atualizar-saude-beneficiario.dto';
 import { AtualizarInteressesBeneficiarioDto } from './dto/atualizar-interesses-beneficiario.dto';
 import { CriarDesligamentoBeneficiarioDto } from './dto/criar-desligamento-beneficiario.dto';
+import {
+  BeneficiarioComHistoricoResponseDto,
+  ListarBeneficiariosResponseDto,
+} from './doc/beneficiario.response.dto';
 
 @Injectable()
 export class BeneficiarioService {
@@ -102,7 +106,40 @@ export class BeneficiarioService {
     return beneficiario;
   }
 
-  async buscarDetalhes(beneficiarioId: string) {
+  async criar(params: CriarBeneficiarioDto) {
+    const { cpf, rg } = params;
+    const { beneficiarioId, ...rest } = params;
+
+    if (beneficiarioId) {
+      return await this.editar(params);
+    }
+
+    if (cpf) {
+      const beneficiarioExistente = await this.buscarPorCpf(cpf);
+      if (beneficiarioExistente) {
+        throw new AppErrorConflict('Beneficiário já cadastrado com esse CPF');
+      }
+    }
+
+    if (rg) {
+      const beneficiarioExistente = await this.buscarPorRg(rg);
+      if (beneficiarioExistente) {
+        throw new AppErrorConflict('Beneficiário já cadastrado com esse RG');
+      }
+    }
+
+    await this.prismaService.beneficiario.create({
+      data: {
+        ...rest,
+        endereco: {},
+        beneficiosSociais: {},
+        saude: {},
+        interesses: {},
+      },
+    });
+  }
+
+  async buscarDetalhes(beneficiarioId: string): Promise<BeneficiarioComHistoricoResponseDto> {
     const beneficiario = await this.prismaService.beneficiario.findUnique({
       where: {
         id: beneficiarioId,
@@ -148,40 +185,7 @@ export class BeneficiarioService {
     return beneficiario;
   }
 
-  async criar(params: CriarBeneficiarioDto) {
-    const { cpf, rg } = params;
-    const { beneficiarioId, ...rest } = params;
-
-    if (beneficiarioId) {
-      return await this.editar(params);
-    }
-
-    if (cpf) {
-      const beneficiarioExistente = await this.buscarPorCpf(cpf);
-      if (beneficiarioExistente) {
-        throw new AppErrorConflict('Beneficiário já cadastrado com esse CPF');
-      }
-    }
-
-    if (rg) {
-      const beneficiarioExistente = await this.buscarPorRg(rg);
-      if (beneficiarioExistente) {
-        throw new AppErrorConflict('Beneficiário já cadastrado com esse RG');
-      }
-    }
-
-    return await this.prismaService.beneficiario.create({
-      data: {
-        ...rest,
-        endereco: {},
-        beneficiosSociais: {},
-        saude: {},
-        interesses: {},
-      },
-    });
-  }
-
-  async listar(filtros: ListarBeneficiariosDto) {
+  async listar(filtros: ListarBeneficiariosDto): Promise<ListarBeneficiariosResponseDto> {
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 10;
     const nome = filtros.nome ?? '';
@@ -201,26 +205,13 @@ export class BeneficiarioService {
         select: {
           id: true,
           nome: true,
-          cpf: true,
-          rg: true,
-          dataNascimento: true,
-          telefone: true,
           status: true,
-          endereco: true,
           criadoEm: true,
           tipoCesta: {
             select: {
               id: true,
               nome: true,
             },
-          },
-          dependentes: {
-            select: {
-              id: true,
-              nome: true,
-              parentesco: true,
-            },
-            orderBy: { nome: 'asc' },
           },
         },
         skip: (pagina - 1) * quantidade,
@@ -261,8 +252,6 @@ export class BeneficiarioService {
         endereco: true,
       },
     });
-
-    return await this.buscarPorId(beneficiarioId);
   }
 
   async atualizarBeneficiosSociais(params: {
@@ -284,8 +273,6 @@ export class BeneficiarioService {
         },
       },
     });
-
-    return await this.buscarPorId(beneficiarioId);
   }
 
   async atualizarSaude(params: { beneficiarioId: string; data: AtualizarSaudeBeneficiarioDto }) {
@@ -304,8 +291,6 @@ export class BeneficiarioService {
         },
       },
     });
-
-    return await this.buscarPorId(beneficiarioId);
   }
 
   async atualizarInteresses(params: {
@@ -327,8 +312,6 @@ export class BeneficiarioService {
         },
       },
     });
-
-    return await this.buscarPorId(beneficiarioId);
   }
 
   async adicionarDependentes(params: {
@@ -350,8 +333,6 @@ export class BeneficiarioService {
         }),
       ),
     );
-
-    return await this.buscarPorId(beneficiarioId);
   }
 
   async editarDependente(params: {
@@ -416,8 +397,6 @@ export class BeneficiarioService {
         },
       },
     });
-
-    return await this.buscarPorId(beneficiarioId);
   }
 
   async desligarBeneficiario(params: {

@@ -4,26 +4,29 @@ class EnderecoResponseDto {
   @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
   id: string;
 
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  beneficiarioId: string;
+
   @ApiProperty({ example: 'Rua das Flores' })
-  rua: string;
+  rua?: string | null;
 
   @ApiProperty({ example: '123' })
-  numero: string;
+  numero?: string | null;
 
   @ApiProperty({ example: 'Centro' })
-  bairro: string;
+  bairro?: string | null;
 
   @ApiProperty({ example: 'São Paulo' })
-  cidade: string;
+  cidade?: string | null;
 
-  @ApiProperty({ example: '12345-678', required: false })
-  cep?: string;
+  @ApiProperty({ example: '12345-678' })
+  cep?: string | null;
 
-  @ApiProperty({ example: 'Apto 123', required: false })
-  complemento?: string;
+  @ApiProperty({ example: 'Apto 123' })
+  complemento?: string | null;
 
-  @ApiProperty({ example: 'Próximo à padaria', required: false })
-  pontoReferencia?: string;
+  @ApiProperty({ example: 'Próximo à padaria' })
+  pontoReferencia?: string | null;
 
   @ApiProperty({ example: 3 })
   numeroComodos: number;
@@ -66,6 +69,9 @@ class BeneficiosSociaisResponseDto {
   @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
   id: string;
 
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  beneficiarioId: string;
+
   @ApiProperty({ example: true })
   bolsaFamilia: boolean;
 
@@ -103,47 +109,53 @@ class BeneficiosSociaisResponseDto {
   tarifaSocialEnergiaEletrica: boolean;
 
   @ApiProperty({ example: 'Vale gás' })
-  outrosBeneficios: string;
+  outrosBeneficios: string | null;
 
   @ApiProperty({ example: 'Aguardando reavaliação do benefício' })
-  observacao: string;
+  observacao: string | null;
 }
 
 class SaudeResponseDto {
   @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
   id: string;
 
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  beneficiarioId: string;
+
   @ApiProperty({ example: true })
-  cartaoSUS: boolean;
+  cartaoSUS: boolean | null;
 
   @ApiProperty({ example: '123456789012345' })
-  numeroCartaoSUS: string;
+  numeroCartaoSUS: string | null;
 
   @ApiProperty({ example: 'Clínica da Família Santa Maria' })
-  clinicaFamilia: string;
+  clinicaFamilia: string | null;
 
   @ApiProperty({ example: 'Posto de Saúde Central' })
-  postoSaude: string;
+  postoSaude: string | null;
 
   @ApiProperty({ example: true })
-  tratamentoHospitalar: boolean;
+  tratamentoHospitalar: boolean | null;
 
   @ApiProperty({ example: 'Hospital São Lucas' })
-  hospital: string;
+  hospital: string | null;
 
   @ApiProperty({ example: 'Tratamento para hipertensão' })
-  tratamentoSaude: string;
+  tratamentoSaude: string | null;
 
   @ApiProperty({ example: 'Losartana, Atenolol' })
-  medicamentos: string;
+  medicamentos: string | null;
 
   @ApiProperty({ example: 'Necessita de consulta com cardiologista' })
-  observacao: string;
+  observacao: string | null;
 }
 
 class InteressesResponseDto {
   @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
   id: string;
+
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  beneficiarioId: string;
 
   // Palestras
   @ApiProperty({ example: true })
@@ -212,38 +224,41 @@ class DependenteResponseDto {
   @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
   id: string;
 
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  beneficiarioId: string;
+
   @ApiProperty({ example: 'João da Silva' })
   nome: string;
 
   @ApiProperty({ example: '123.456.789-00' })
-  cpf?: string;
+  cpf?: string | null;
 
   @ApiProperty({ example: '22.444.111-9' })
-  rg?: string;
+  rg?: string | null;
 
   @ApiProperty({ example: '123456789' })
-  certidaoNascimento?: string;
+  certidaoNascimento?: string | null;
 
   @ApiProperty({ example: 'Filho' })
   parentesco: string;
 
   @ApiProperty({ example: 'ENSINO_MEDIO' })
-  escolaridade: string;
+  escolaridade: string | null;
 
   @ApiProperty({ example: 'MASCULINO' })
   sexo: string;
 
   @ApiProperty({ example: '2015-01-01' })
-  dataNascimento?: Date;
+  dataNascimento?: Date | null;
 
   @ApiProperty({ example: '1500' })
-  rendaMensal: string;
+  rendaMensal: string | null;
 
   @ApiProperty({ example: 'Vendedor' })
-  trabalho: string;
+  trabalho: string | null;
 
   @ApiProperty({ example: 'Observações sobre o dependente' })
-  observacao: string;
+  observacao: string | null;
 }
 
 class DesligamentoResponseDto {
@@ -251,10 +266,7 @@ class DesligamentoResponseDto {
   id: string;
 
   @ApiProperty({ example: 'Mudança para outra cidade' })
-  motivo: string;
-
-  @ApiProperty({ example: '2025-05-01T00:00:00.000Z' })
-  dataDesligamento: Date;
+  motivo: string | null;
 
   @ApiProperty({ example: '2025-05-01T00:00:00.000Z' })
   criadoEm: Date;
@@ -266,12 +278,6 @@ class TipoCestaResponseDto {
 
   @ApiProperty({ example: 'Cesta Básica' })
   nome: string;
-
-  @ApiProperty({ example: 'ATIVO' })
-  status: string;
-
-  @ApiProperty({ example: 'Cesta para família de até 4 pessoas' })
-  descricao: string;
 }
 
 class HistoricoRecebimentosBeneficiarioResponseDto {
@@ -279,13 +285,30 @@ class HistoricoRecebimentosBeneficiarioResponseDto {
   id: string;
 
   @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
-  tipoCestaId: string;
+  tipoCestaId?: string | null;
 
   @ApiProperty({ example: 'Cesta Básica Família' })
-  nomeCesta: string;
+  nomeCesta?: string | null;
 
   @ApiProperty({ example: '2024-01-01T00:00:00.000Z' })
-  criadoEm: string;
+  criadoEm: Date;
+}
+
+class BeneficiarioNaListaResponseDto {
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  id: string;
+
+  @ApiProperty({ example: 'Maria da Silva' })
+  nome: string;
+
+  @ApiProperty({ example: 'ATIVO' })
+  status: string;
+
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
+  criadoEm: Date;
+
+  @ApiProperty({ type: TipoCestaResponseDto })
+  tipoCesta?: TipoCestaResponseDto | null;
 }
 
 export class BeneficiarioResponseDto {
@@ -299,28 +322,31 @@ export class BeneficiarioResponseDto {
   status: string;
 
   @ApiProperty({ example: '123.456.789-00' })
-  cpf: string;
+  cpf: string | null;
 
   @ApiProperty({ example: '22.444.111-9' })
-  rg: string;
+  rg: string | null;
 
   @ApiProperty({ example: 'F' })
   sexo: string;
 
   @ApiProperty({ example: '1990-01-01T00:00:00.000Z' })
-  dataNascimento: string;
+  dataNascimento: Date | null;
 
   @ApiProperty({ example: '(11) 99999-9999' })
-  telefone: string;
+  telefone: string | null;
 
   @ApiProperty({ example: 'CASADO' })
-  estadoCivil: string;
+  estadoCivil: string | null;
 
   @ApiProperty({ example: 'Professora' })
-  profissao: string;
+  profissao: string | null;
 
   @ApiProperty({ example: 'Até 1 salário mínimo' })
-  rendaMensal: string;
+  rendaMensal: string | null;
+
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2f' })
+  tipoCestaId: string | null;
 
   @ApiProperty({ example: false })
   pessoaComDeficiencia: boolean;
@@ -329,22 +355,22 @@ export class BeneficiarioResponseDto {
   criadoEm: Date;
 
   @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
-  atualizadoEm: Date;
+  atualizadoEm: Date | null;
 
-  @ApiProperty({ type: EnderecoResponseDto, required: false })
-  endereco?: EnderecoResponseDto;
+  @ApiProperty({ type: EnderecoResponseDto })
+  endereco?: EnderecoResponseDto | null;
 
-  @ApiProperty({ type: BeneficiosSociaisResponseDto, required: false })
-  beneficiosSociais?: BeneficiosSociaisResponseDto;
+  @ApiProperty({ type: BeneficiosSociaisResponseDto })
+  beneficiosSociais?: BeneficiosSociaisResponseDto | null;
 
-  @ApiProperty({ type: SaudeResponseDto, required: false })
-  saude?: SaudeResponseDto;
+  @ApiProperty({ type: SaudeResponseDto })
+  saude?: SaudeResponseDto | null;
 
-  @ApiProperty({ type: InteressesResponseDto, required: false })
-  interesses?: InteressesResponseDto;
+  @ApiProperty({ type: InteressesResponseDto })
+  interesses?: InteressesResponseDto | null;
 
-  @ApiProperty({ type: TipoCestaResponseDto, required: false })
-  tipoCesta?: TipoCestaResponseDto;
+  @ApiProperty({ type: TipoCestaResponseDto })
+  tipoCesta?: TipoCestaResponseDto | null;
 
   @ApiProperty({ type: [DependenteResponseDto] })
   dependentes: DependenteResponseDto[];
@@ -371,6 +397,6 @@ export class ListarBeneficiariosResponseDto {
   @ApiProperty({ example: 5 })
   totalPaginas: number;
 
-  @ApiProperty({ type: [BeneficiarioResponseDto] })
-  resultado: BeneficiarioResponseDto[];
+  @ApiProperty({ type: [BeneficiarioNaListaResponseDto] })
+  resultado: BeneficiarioNaListaResponseDto[];
 }
