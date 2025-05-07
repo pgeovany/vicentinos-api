@@ -163,6 +163,7 @@ model Beneficiario {
   rendaMensal          String?
   pessoaComDeficiencia Boolean   @default(false) @map("pessoa_com_deficiencia")
   tipoCestaId          String?   @map("tipo_cesta_id")
+  efetivadoEm          DateTime? @map("efetivado_em")
 
   tipoCesta              TipoCesta?                     @relation(fields: [tipoCestaId], references: [id], onDelete: SetNull)
   endereco               EnderecoBeneficiario?
