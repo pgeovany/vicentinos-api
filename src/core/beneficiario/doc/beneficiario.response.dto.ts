@@ -305,7 +305,7 @@ class BeneficiarioNaListaResponseDto {
   status: string;
 
   @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
-  criadoEm: Date;
+  efetivadoEm?: Date | null;
 
   @ApiProperty({ type: TipoCestaResponseDto })
   tipoCesta?: TipoCestaResponseDto | null;
@@ -350,6 +350,9 @@ export class BeneficiarioResponseDto {
 
   @ApiProperty({ example: false })
   pessoaComDeficiencia: boolean;
+
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
+  efetivadoEm?: Date | null;
 
   @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
   criadoEm: Date;
@@ -440,6 +443,9 @@ export class CriarBeneficiarioResponseDto {
 
   @ApiProperty({ example: false })
   pessoaComDeficiencia: boolean;
+
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
+  efetivadoEm?: Date | null;
 
   @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
   criadoEm: Date;

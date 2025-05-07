@@ -13,7 +13,6 @@ import { ListarBeneficiariosDto } from './dto/listar-beneficiarios.dto';
 import { Doc } from 'src/utils/docs/doc';
 import {
   BeneficiarioComHistoricoResponseDto,
-  BeneficiarioResponseDto,
   CriarBeneficiarioResponseDto,
   ListarBeneficiariosResponseDto,
 } from './doc/beneficiario.response.dto';
@@ -159,6 +158,15 @@ export class BeneficiarioController {
       beneficiarioId,
       tipoCestaId: data.tipoCestaId,
     });
+  }
+
+  @Doc({
+    nome: 'Reativar beneficiário',
+    descricao: 'Ativa um beneficiário que estava inativo',
+  })
+  @Put('/:beneficiarioId/ativar')
+  async reativarBeneficiario(@Param('beneficiarioId') beneficiarioId: string) {
+    return await this.beneficiarioService.reativarBeneficiario(beneficiarioId);
   }
 
   @Doc({

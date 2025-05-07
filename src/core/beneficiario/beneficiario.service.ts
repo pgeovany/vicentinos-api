@@ -131,6 +131,7 @@ export class BeneficiarioService {
     return await this.prismaService.beneficiario.create({
       data: {
         ...rest,
+        efetivadoEm: new Date(),
         endereco: {},
         beneficiosSociais: {},
         saude: {},
@@ -206,7 +207,7 @@ export class BeneficiarioService {
           id: true,
           nome: true,
           status: true,
-          criadoEm: true,
+          efetivadoEm: true,
           tipoCesta: {
             select: {
               id: true,
@@ -423,5 +424,21 @@ export class BeneficiarioService {
         },
       }),
     ]);
+  }
+
+  async reativarBeneficiario(beneficiarioId: string) {
+    const beneficiario = await this.buscarPorId(beneficiarioId);
+
+    if (beneficiario.status === ENUM_STATUS_BENEFICIARIO.ATIVO) {
+      throw new AppErrorConflict('Beneficiário já está ativo');
+    }
+
+    await this.prismaService.beneficiario.update({
+      where: { id: beneficiarioId },
+      data: {
+        status: ENUM_STATUS_BENEFICIARIO.ATIVO,
+        efetivadoEm: new Date(),
+      },
+    });
   }
 }
