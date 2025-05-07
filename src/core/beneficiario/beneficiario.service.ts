@@ -128,7 +128,7 @@ export class BeneficiarioService {
       }
     }
 
-    await this.prismaService.beneficiario.create({
+    return await this.prismaService.beneficiario.create({
       data: {
         ...rest,
         endereco: {},

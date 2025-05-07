@@ -14,6 +14,7 @@ import { Doc } from 'src/utils/docs/doc';
 import {
   BeneficiarioComHistoricoResponseDto,
   BeneficiarioResponseDto,
+  CriarBeneficiarioResponseDto,
   ListarBeneficiariosResponseDto,
 } from './doc/beneficiario.response.dto';
 import { CriarDesligamentoBeneficiarioDto } from './dto/criar-desligamento-beneficiario.dto';
@@ -52,6 +53,7 @@ export class BeneficiarioController {
     nome: 'Criar beneficiário',
     descricao:
       'Cria um novo beneficiário com dados básicos. Caso beneficiarioId seja enviado, atualiza os dados do beneficiário',
+    resposta: CriarBeneficiarioResponseDto,
   })
   @Post('/')
   async criar(@Body() dto: CriarBeneficiarioDto) {

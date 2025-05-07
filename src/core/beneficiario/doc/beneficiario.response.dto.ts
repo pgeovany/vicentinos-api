@@ -400,3 +400,50 @@ export class ListarBeneficiariosResponseDto {
   @ApiProperty({ type: [BeneficiarioNaListaResponseDto] })
   resultado: BeneficiarioNaListaResponseDto[];
 }
+
+export class CriarBeneficiarioResponseDto {
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2s' })
+  id: string;
+
+  @ApiProperty({ example: 'Maria da Silva' })
+  nome: string;
+
+  @ApiProperty({ example: 'ATIVO' })
+  status: string;
+
+  @ApiProperty({ example: '123.456.789-00' })
+  cpf: string | null;
+
+  @ApiProperty({ example: '22.444.111-9' })
+  rg: string | null;
+
+  @ApiProperty({ example: 'F' })
+  sexo: string;
+
+  @ApiProperty({ example: '1990-01-01T00:00:00.000Z' })
+  dataNascimento: Date | null;
+
+  @ApiProperty({ example: '(11) 99999-9999' })
+  telefone: string | null;
+
+  @ApiProperty({ example: 'CASADO' })
+  estadoCivil: string | null;
+
+  @ApiProperty({ example: 'Professora' })
+  profissao: string | null;
+
+  @ApiProperty({ example: 'Até 1 salário mínimo' })
+  rendaMensal: string | null;
+
+  @ApiProperty({ example: 'cm8wejfta0000gn0falnw8c2f' })
+  tipoCestaId: string | null;
+
+  @ApiProperty({ example: false })
+  pessoaComDeficiencia: boolean;
+
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
+  criadoEm: Date;
+
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
+  atualizadoEm: Date | null;
+}
