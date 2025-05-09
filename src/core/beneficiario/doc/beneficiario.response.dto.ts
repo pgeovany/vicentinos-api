@@ -31,26 +31,8 @@ class EnderecoResponseDto {
   @ApiProperty({ example: 3 })
   numeroComodos: number;
 
-  @ApiProperty({ example: true })
-  proprio: boolean;
-
-  @ApiProperty({ example: false })
-  financiado: boolean;
-
-  @ApiProperty({ example: false })
-  alugado: boolean;
-
-  @ApiProperty({ example: false })
-  cedido: boolean;
-
-  @ApiProperty({ example: false })
-  heranca: boolean;
-
-  @ApiProperty({ example: false })
-  programaSocial: boolean;
-
-  @ApiProperty({ example: false })
-  ocupacao: boolean;
+  @ApiProperty({ example: 'Próprio' })
+  tipoMoradia?: string | null;
 
   @ApiProperty({ example: true })
   banheiro: boolean;

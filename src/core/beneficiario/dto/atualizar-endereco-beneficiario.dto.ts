@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsInt, IsBoolean, IsNotEmpty } from 'class-validator';
+import { IsOptional, IsString, IsInt, IsBoolean, IsNotEmpty, IsEnum } from 'class-validator';
+import { ENUM_TIPO_MORADIA_BENEFICIARIO } from 'src/utils/enum/beneficiario.enum';
 
 export class AtualizarEnderecoBeneficiarioDto {
   @ApiProperty({ example: 'Rua das Flores', required: false })
@@ -42,40 +43,14 @@ export class AtualizarEnderecoBeneficiarioDto {
   @IsInt()
   numeroComodos: number;
 
-  @ApiProperty({ example: true, required: false })
+  @ApiProperty({
+    example: ENUM_TIPO_MORADIA_BENEFICIARIO.PROPRIO,
+    required: false,
+    enum: ENUM_TIPO_MORADIA_BENEFICIARIO,
+  })
   @IsOptional()
-  @IsBoolean()
-  proprio?: boolean;
-
-  @ApiProperty({ example: false, required: false })
-  @IsOptional()
-  @IsBoolean()
-  financiado?: boolean;
-
-  @ApiProperty({ example: false, required: false })
-  @IsOptional()
-  @IsBoolean()
-  alugado?: boolean;
-
-  @ApiProperty({ example: false, required: false })
-  @IsOptional()
-  @IsBoolean()
-  cedido?: boolean;
-
-  @ApiProperty({ example: false, required: false })
-  @IsOptional()
-  @IsBoolean()
-  heranca?: boolean;
-
-  @ApiProperty({ example: false, required: false })
-  @IsOptional()
-  @IsBoolean()
-  programaSocial?: boolean;
-
-  @ApiProperty({ example: false, required: false })
-  @IsOptional()
-  @IsBoolean()
-  ocupacao?: boolean;
+  @IsEnum(ENUM_TIPO_MORADIA_BENEFICIARIO)
+  tipoMoradia?: string;
 
   @ApiProperty({ example: true, required: false })
   @IsOptional()

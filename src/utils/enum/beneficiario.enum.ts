@@ -15,3 +15,13 @@ export enum ENUM_SEXO_BENEFICIARIO {
   MASCULINO = 'M',
   FEMININO = 'F',
 }
+
+export enum ENUM_TIPO_MORADIA_BENEFICIARIO {
+  PROPRIO = 'Próprio',
+  FINANCIADO = 'Financiado',
+  ALUGADO = 'Alugado',
+  CEDIDO = 'Cedido',
+  HERANCA = 'Herança',
+  PROGRAMA_SOCIAL = 'Programa Social',
+  OCUPACAO = 'Ocupação',
+}

@@ -190,15 +190,8 @@ model EnderecoBeneficiario {
   cep             String?
   complemento     String?
   pontoReferencia String? @map("ponto_referencia")
+  tipoMoradia     String? @map("tipo_moradia")
   numeroComodos   Int     @map("numero_comodos")
-
-  proprio        Boolean @default(false)
-  financiado     Boolean @default(false)
-  alugado        Boolean @default(false)
-  cedido         Boolean @default(false)
-  heranca        Boolean @default(false)
-  programaSocial Boolean @default(false)
-  ocupacao       Boolean @default(false)
 
   banheiro        Boolean @default(true)
   aguaEncanada    Boolean @default(true) @map("agua_encanada")
