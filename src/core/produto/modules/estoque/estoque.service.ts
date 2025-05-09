@@ -258,6 +258,18 @@ export class EstoqueService {
   }
 
   async analisarEstoque() {
+    const produtos = await this.prismaService.produto.findMany({
+      select: {
+        id: true,
+        nome: true,
+        estoque: {
+          select: {
+            quantidade: true,
+          },
+        },
+      },
+    });
+
     const beneficiariosAtivos = await this.prismaService.beneficiario.findMany({
       where: {
         status: ENUM_STATUS_BENEFICIARIO.ATIVO,
@@ -270,16 +282,6 @@ export class EstoqueService {
               select: {
                 produtoId: true,
                 quantidade: true,
-                produto: {
-                  select: {
-                    nome: true,
-                    estoque: {
-                      select: {
-                        quantidade: true,
-                      },
-                    },
-                  },
-                },
               },
             },
           },
@@ -292,16 +294,21 @@ export class EstoqueService {
       { nome: string; reservado: number; disponivel: number }
     >();
 
+    produtos.forEach((produto) => {
+      produtosReservados.set(produto.id, {
+        nome: produto.nome,
+        reservado: 0,
+        disponivel: produto.estoque?.quantidade ?? 0,
+      });
+    });
+
     beneficiariosAtivos.forEach((beneficiario) => {
       beneficiario.tipoCesta?.produtos.forEach((produtoCesta) => {
-        const atual = produtosReservados.get(produtoCesta.produtoId) || {
-          nome: produtoCesta.produto.nome,
-          reservado: 0,
-          disponivel: produtoCesta.produto.estoque?.quantidade ?? 0,
-        };
+        const atual = produtosReservados.get(produtoCesta.produtoId);
 
-        atual.reservado += produtoCesta.quantidade;
-        produtosReservados.set(produtoCesta.produtoId, atual);
+        if (atual) {
+          atual.reservado += produtoCesta.quantidade;
+        }
       });
     });
 
