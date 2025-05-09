@@ -9,6 +9,7 @@ import { ListarDoacoesDto } from './dto/listar-doacoes.dto';
 import { Prisma } from '@prisma/client';
 import { ObterEstatisticasDoacoesDto } from './dto/obter-estatisticas-doacoes.dto';
 import { EstatisticasDoacoesResponseDto } from './doc/recebimento-doacao.response.dto';
+import { endOfDay, startOfDay } from 'date-fns';
 
 @Injectable()
 export class RecebimentoDoacaoService {
@@ -104,8 +105,8 @@ export class RecebimentoDoacaoService {
     const origem = filtros.origem ?? undefined;
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 10;
-    const dataInicio = filtros.dataInicio ? filtros.dataInicio : undefined;
-    const dataFim = filtros.dataFim ? filtros.dataFim : undefined;
+    const dataInicio = filtros.dataInicio ? startOfDay(filtros.dataInicio) : undefined;
+    const dataFim = filtros.dataFim ? endOfDay(filtros.dataFim) : undefined;
 
     const where: Prisma.RecebimentoDoacaoWhereInput = {
       origem,
@@ -171,8 +172,8 @@ export class RecebimentoDoacaoService {
     params: ObterEstatisticasDoacoesDto,
   ): Promise<EstatisticasDoacoesResponseDto> {
     const origem = params.origem ?? undefined;
-    const dataInicio = params.dataInicio ?? undefined;
-    const dataFim = params.dataFim ?? undefined;
+    const dataInicio = params.dataInicio ? startOfDay(params.dataInicio) : undefined;
+    const dataFim = params.dataFim ? endOfDay(params.dataFim) : undefined;
 
     const where: Prisma.RecebimentoDoacaoWhereInput = {
       origem,

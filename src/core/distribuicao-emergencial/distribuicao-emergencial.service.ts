@@ -8,6 +8,7 @@ import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE } from 'src/utils/enum/estoque.enum';
 import { ListarDistribuicoesEmergenciaisDto } from './dto/listar-distribuicao-emergencial.dto';
 import { Prisma } from '@prisma/client';
 import { ObterEstatisticasDistribuicaoEmergencialDto } from './dto/obter-estatisticas-distribuicao-emergencial.dto';
+import { endOfDay, startOfDay } from 'date-fns';
 
 @Injectable()
 export class DistribuicaoEmergencialService {
@@ -100,8 +101,8 @@ export class DistribuicaoEmergencialService {
   async listar(filtros: ListarDistribuicoesEmergenciaisDto) {
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 10;
-    const dataInicio = filtros.dataInicio ? filtros.dataInicio : undefined;
-    const dataFim = filtros.dataFim ? filtros.dataFim : undefined;
+    const dataInicio = filtros.dataInicio ? startOfDay(filtros.dataInicio) : undefined;
+    const dataFim = filtros.dataFim ? endOfDay(filtros.dataFim) : undefined;
 
     const where: Prisma.DistribuicaoEmergencialWhereInput = {
       criadoEm: {
@@ -164,8 +165,8 @@ export class DistribuicaoEmergencialService {
   }
 
   async obterEstatisticas(params: ObterEstatisticasDistribuicaoEmergencialDto) {
-    const dataInicio = params.dataInicio ?? undefined;
-    const dataFim = params.dataFim ?? undefined;
+    const dataInicio = params.dataInicio ? startOfDay(params.dataInicio) : undefined;
+    const dataFim = params.dataFim ? endOfDay(params.dataFim) : undefined;
 
     const where: Prisma.DistribuicaoEmergencialWhereInput = {
       criadoEm: {

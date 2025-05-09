@@ -9,6 +9,7 @@ import { ListarEntradasESaidas } from './dto/listar-quantidade-movimentacoes.dto
 import { ENUM_TIPO_MOVIMENTACAO_ESTOQUE, isEntrada, isSaida } from 'src/utils/enum/estoque.enum';
 import { ENUM_STATUS_BENEFICIARIO } from 'src/utils/enum/beneficiario.enum';
 import { RemocaoDiretaEstoqueDto } from './dto/remocao-direta.dto';
+import { endOfDay, startOfDay } from 'date-fns';
 
 @Injectable()
 export class EstoqueService {
@@ -66,8 +67,8 @@ export class EstoqueService {
     const nome = filtros.nome ?? '';
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 10;
-    const dataInicio = filtros.dataInicio ?? undefined;
-    const dataFim = filtros.dataFim ?? undefined;
+    const dataInicio = filtros.dataInicio ? startOfDay(filtros.dataInicio) : undefined;
+    const dataFim = filtros.dataFim ? endOfDay(filtros.dataFim) : undefined;
 
     const where: Prisma.ProdutoMovimentacaoEstoqueWhereInput = {
       produtoEstoque: {
@@ -138,8 +139,8 @@ export class EstoqueService {
     const nome = filtros.nome ?? '';
     const pagina = filtros.pagina ? +filtros.pagina : 1;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 15;
-    const dataInicio = filtros.dataInicio ?? undefined;
-    const dataFim = filtros.dataFim ?? undefined;
+    const dataInicio = filtros.dataInicio ? startOfDay(filtros.dataInicio) : undefined;
+    const dataFim = filtros.dataFim ? endOfDay(filtros.dataFim) : undefined;
 
     const where: Prisma.ProdutoMovimentacaoEstoqueWhereInput = {
       produtoEstoque: {
