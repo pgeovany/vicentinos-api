@@ -22,6 +22,7 @@ export class DistribuicaoCestaService {
     const beneficiariosJaContempladosNoMes =
       await this.prismaService.historicoDistribuicao.findMany({
         where: {
+          beneficiarioId: { not: null },
           criadoEm: {
             gte: dataInicio,
             lte: dataFim,
@@ -32,7 +33,7 @@ export class DistribuicaoCestaService {
         },
       });
 
-    return beneficiariosJaContempladosNoMes.map((d) => d.beneficiarioId!);
+    return beneficiariosJaContempladosNoMes.map((d) => d.beneficiarioId!) ?? [];
   }
 
   async entregar(beneficiarioId: string) {
@@ -120,9 +121,6 @@ export class DistribuicaoCestaService {
     });
 
     const where: Prisma.BeneficiarioWhereInput = {
-      id: {
-        notIn: beneficiariosJaContempladosNoMes,
-      },
       nome: {
         contains: nome,
         mode: 'insensitive',
@@ -130,6 +128,12 @@ export class DistribuicaoCestaService {
       status: ENUM_STATUS_BENEFICIARIO.ATIVO,
       tipoCestaId: { not: null },
     };
+
+    if (beneficiariosJaContempladosNoMes.length > 0) {
+      where.id = {
+        notIn: beneficiariosJaContempladosNoMes,
+      };
+    }
 
     const [beneficiariosPendentes, totalBeneficiarios, beneficiariosRestantes] = await Promise.all([
       this.prismaService.beneficiario.findMany({
@@ -162,9 +166,9 @@ export class DistribuicaoCestaService {
       this.prismaService.beneficiario.count({ where }),
       this.prismaService.beneficiario.count({
         where: {
-          id: {
-            notIn: beneficiariosJaContempladosNoMes,
-          },
+          ...(beneficiariosJaContempladosNoMes.length > 0
+            ? { id: { notIn: beneficiariosJaContempladosNoMes } }
+            : {}),
           status: ENUM_STATUS_BENEFICIARIO.ATIVO,
           tipoCestaId: { not: null },
         },
