@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumberString, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
+import { ENUM_STATUS_BENEFICIARIO } from 'src/utils/enum/beneficiario.enum';
 
 export class ListarBeneficiariosDto {
   @ApiProperty({ example: 'Maria', required: false })
@@ -11,6 +12,15 @@ export class ListarBeneficiariosDto {
   @IsOptional()
   @IsString()
   tipoCestaId?: string;
+
+  @ApiProperty({
+    example: ENUM_STATUS_BENEFICIARIO.ATIVO,
+    required: false,
+    enum: ENUM_STATUS_BENEFICIARIO,
+  })
+  @IsOptional()
+  @IsEnum(ENUM_STATUS_BENEFICIARIO)
+  status?: ENUM_STATUS_BENEFICIARIO;
 
   @ApiProperty({ example: '1', required: false })
   @IsNumberString()

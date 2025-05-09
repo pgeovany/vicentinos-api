@@ -188,11 +188,14 @@ export class BeneficiarioService {
 
   async listar(filtros: ListarBeneficiariosDto): Promise<ListarBeneficiariosResponseDto> {
     const pagina = filtros.pagina ? +filtros.pagina : 1;
+    const tipoCestaId = filtros.tipoCestaId ?? undefined;
     const quantidade = filtros.quantidade ? +filtros.quantidade : 10;
     const nome = filtros.nome ?? '';
+    const status = filtros.status ?? undefined;
 
     const where: Prisma.BeneficiarioWhereInput = {
-      tipoCestaId: filtros.tipoCestaId,
+      tipoCestaId,
+      status,
       nome: {
         contains: nome,
         mode: 'insensitive',
