@@ -109,7 +109,9 @@ export class RecebimentoDoacaoService {
     const dataFim = filtros.dataFim ? endOfDay(filtros.dataFim) : undefined;
 
     const where: Prisma.RecebimentoDoacaoWhereInput = {
-      origem,
+      origem: origem ?? {
+        not: 'INIT',
+      },
       criadoEm: {
         gte: dataInicio,
         lte: dataFim,
@@ -176,7 +178,9 @@ export class RecebimentoDoacaoService {
     const dataFim = params.dataFim ? endOfDay(params.dataFim) : undefined;
 
     const where: Prisma.RecebimentoDoacaoWhereInput = {
-      origem,
+      origem: origem ?? {
+        not: 'INIT',
+      },
       criadoEm: {
         gte: dataInicio,
         lte: dataFim,
