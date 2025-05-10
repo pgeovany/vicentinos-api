@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsOptional,
-  IsEmail,
   IsDateString,
   IsPhoneNumber,
   IsNotEmpty,
@@ -55,11 +54,15 @@ export class CriarBeneficiarioDto {
   @IsPhoneNumber('BR')
   telefone?: string;
 
-  @ApiProperty({ example: ENUM_ESTADO_CIVIL_BENEFICIARIO.CASADO, required: false })
+  @ApiProperty({
+    example: ENUM_ESTADO_CIVIL_BENEFICIARIO.CASADO,
+    enum: ENUM_ESTADO_CIVIL_BENEFICIARIO,
+    required: false,
+  })
   @IsEnum(ENUM_ESTADO_CIVIL_BENEFICIARIO)
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  estadoCivil: ENUM_ESTADO_CIVIL_BENEFICIARIO;
+  estadoCivil?: ENUM_ESTADO_CIVIL_BENEFICIARIO;
 
   @ApiProperty({ example: 'Professora', required: false })
   @IsOptional()
